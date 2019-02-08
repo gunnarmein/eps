@@ -1,0 +1,91 @@
+
+
+!this reader skips the first line, always
+
+!states 
+!"state, stateid, name, lights (pairs of "lightname:color;" and must include semicolon even for last), comments
+state, 0, allred, -
+!state, 1, n, ns:green;ne:green;nw:green; 
+!state, 2, e, ew:green;es:green;en:green;
+!state, 3, s, sn:green;se:green;sw:green;
+!state, 4, w, we:green;ws:green;wn:green;
+
+!new states
+!all north/south cars go forward and can take a right turn
+state, 1, nsright, ns:green;sn:green;nw:green;se:green; 
+!all north/south cars can take a left turn, all east/west cars can take right turn
+state, 2, nsleftewright, ne:green;sw:green;en:green;ws:green;
+!all east/west cars go forward and can take a right turn
+state, 3, ewright, ew:green;we:green;en:green;ws:green; 
+!all east/west cars can take a left turn, all north/south cars can take a right turn
+state, 4, ewleftnsright, es:green;wn:green;nw:green;se:green;
+
+!yellow
+!state, 5, nyellow, ns:yellow;ne:yellow;nw:yellow;
+!state, 6, eyellow, ew:yellow;es:yellow;en:yellow;
+!state, 7, syellow, sn:yellow;se:yellow;sw:yellow;
+!state, 8, wyellow, we:yellow;ws:yellow;wn:yellow;
+state, 5, Ynsright, ns:yellow;sn:yellow;nw:yellow;se:yellow; 
+state, 6, Ynsleftewright, ne:yellow;sw:yellow;en:yellow;ws:yellow;
+state, 7, Yewright, ew:yellow;we:yellow;en:yellow;ws:yellow; 
+state, 8, Yewleftnsright, es:yellow;wn:yellow;nw:yellow;se:yellow;
+
+!deltas
+!"delta", stateid, event, newstateid, action, comments
+!events: traffic light names stand for that light detecting a car (e.g. ne, sn etc.) "*" matches any event unless a more specific one is matched.
+!actions: 0 leaves current timer alone, -1 cancels current timer, any other number cancels and then sets new timer
+! I had to make new delta functions so that when a light detects a car, it has to point to a new state
+delta, 0, start, 0, -1,
+delta, 0, ns, 1, 5
+delta, 0, ew, 3, 5
+delta, 0, sn, 1, 5
+delta, 0, we, 3, 5
+delta, 0, ne, 2, 5
+delta, 0, es, 4, 5
+delta, 0, se, 1, 5
+delta, 0, ws, 3, 5
+delta, 0, nw, 1, 5
+delta, 0, en, 3, 5
+delta, 0, sw, 2, 5
+delta, 0, wn, 4, 5
+
+!delta, 0, start, 0, -1,
+!delta, 0, ns, 1, 5
+!delta, 0, ew, 2, 5
+!delta, 0, sn, 3, 5
+!delta, 0, we, 4, 5
+!delta, 0, ne, 1, 5
+!delta, 0, es, 2, 5
+!delta, 0, se, 3, 5
+!delta, 0, ws, 4, 5
+!delta, 0, nw, 1, 5
+!delta, 0, en, 2, 5
+!delta, 0, sw, 3, 5
+!delta, 0, wn, 4, 5
+
+ 
+
+!delta, 1, timer, 5, 2,
+!delta, 2, timer, 3, 5, 
+!delta, 3, timer, 4, 5,
+!delta, 4, timer, 1, 5,
+
+!yellow states:
+!north
+delta, 1, timer, 5, 2,
+delta, 5, timer, 0, -1,
+
+
+!east
+delta, 2, timer, 6, 2,
+delta, 6, timer, 0, -1,
+
+
+!south
+delta, 3, timer, 7, 2,
+delta, 7, timer, 0, -1,
+
+
+!west
+delta, 4, timer, 8, 2
+delta, 8, timer, 0, -1,
