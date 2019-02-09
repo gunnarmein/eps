@@ -23,7 +23,7 @@ public  class Instruction {
         int value;
         String comment;
 
-        Instruction(Inx name, Mode opDest, Reg dest, Mode opSrc, Reg src, int val) {
+        public Instruction(Inx name, Mode opDest, Reg dest, Mode opSrc, Reg src, int val) {
             this.name = name;
             this.opSrc = opSrc;
             this.opDest = opDest;
@@ -32,7 +32,7 @@ public  class Instruction {
             this.value = val;
         }
 
-        Instruction(Inx name, Mode opDest, Reg dest, Mode opSrc, Reg src, int val, String comment) {
+        public Instruction(Inx name, Mode opDest, Reg dest, Mode opSrc, Reg src, int val, String comment) {
             this.name = name;
             this.opSrc = opSrc;
             this.opDest = opDest;
@@ -42,7 +42,7 @@ public  class Instruction {
             this.comment = comment;
         }
 
-        boolean validate() {
+        public boolean validate() {
             if ((this.opDest == Mode.MEMORY && this.opSrc == Mode.MEMORY)
                     || (this.opDest == Mode.INDIRECT && this.opSrc == Mode.INDIRECT)
                     || (this.opDest == Mode.INDIRECT && this.opSrc == Mode.MEMORY)

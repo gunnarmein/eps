@@ -1,4 +1,4 @@
-// Generated from c:\Users\gmein\Documents\GitHub\eps\AP-Compilers\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
+// Generated from c:\Users\gmein\Documents\GitHub\eps\AP-Compilers\Compilers\src\lol\LOLcode.g4 by ANTLR 4.7.1
 
    package lol;
 

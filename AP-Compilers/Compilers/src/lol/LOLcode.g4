@@ -48,6 +48,7 @@ IT: 'it' | 'IT';
 MKAY: 'mkay' | 'MKAY';
 SMOOSH: 'smoosh'|'SMOOSH';
 TROOF: 'troof' | 'TROOF';
+NOOB: 'noob' | 'NOOB';
 BOTH: 'both' | 'BOTH';
 EITHER: 'either' | 'EITHER';
 ANY: 'any' | 'ANY';
@@ -107,7 +108,7 @@ WS   : [ \r\t] -> skip;
 
 literal_value: NUMBER|YARN_LITERAL|WIN|FAIL;
 atom: literal_value | IT | IDENTIFIER;
-vartype: NUMBR | NUMBAR | YARN | TROOF;
+vartype: NUMBR | NUMBAR | YARN | TROOF |NOOB;
 
 
 
@@ -154,12 +155,12 @@ expr: sum |
 
 
 // variables and assignment
-var_decl: I HAS A IDENTIFIER (ITZ expr)?;
+var_decl: I HAS A vartype IDENTIFIER (ITZ expr)?;
 var_assignment: IDENTIFIER R expr;
 
 
 // function declaration
-arg_decl: YR IDENTIFIER;
+arg_decl: YR vartype IDENTIFIER;
 more_args_decl: (AN arg_decl)* MKAY;
 args_decl: arg_decl more_args_decl?;
 return_type: INTO vartype;
@@ -170,7 +171,7 @@ return_statement: (FOUND YR expr) | GTFO;
 
 //function call
 arg: YR expr;
-more_args: (AN arg_decl)* MKAY;
+more_args: (AN arg)* MKAY;
 args: arg more_args?;
 func_call: I (DUZ|IZ) IDENTIFIER args;
 

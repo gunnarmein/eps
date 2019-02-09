@@ -18,12 +18,15 @@ public class Program {
     StringMap strings;
     RuntimeSupport runtime;
     HashMap<String, Label> labels;
+    HashMap<Integer, Label> labelLines;
 
     public Program(ArrayList<Instruction> list, RuntimeSupport runtime) {
         this.instructions = list;
         this.strings = new StringMap();
         this.runtime = runtime;
         this.labels = new HashMap<>();
+        this.labelLines = new HashMap<>();
+
     }
 
     public int newStringId(String s) {
@@ -41,7 +44,8 @@ public class Program {
             labels.put(name, l);
         }
         l.define(this.instructions.size());
-        Util.println("label " + name + " defined at " + l.line);
+        labelLines.put(this.instructions.size(), l);
+        //Util.println("label " + name + " defined at " + l.line);
     }
 
     public int refLabel(String name) {
@@ -51,7 +55,7 @@ public class Program {
             labels.put(name, l);
         }
         l.addRef(this.instructions.size());
-        Util.println("label " + name + " referenced at " + this.instructions.size());
+        //Util.println("label " + name + " referenced at " + this.instructions.size());
         return 0;
     }
 
@@ -77,15 +81,23 @@ public class Program {
             }
         }
     }
+    
+    public void add(Instruction ix) {
+        this.instructions.add(ix);
+    }
 
     public void dump() {
         int line = 0;
         for (Instruction x : instructions) {
-            System.out.println(Util.rightJustify("" + line, 4) + ": " + x);
+            Label l = labelLines.get(line);
+            if (l != null) {
+                Util.println(l.name+":");
+            }
+            Util.println(Util.rightJustify("" + line, 4) + ": " + x);
             line++;
             // extra line after ret
             if (x.name == Vx86.Inx.RET) {
-                System.out.println("");
+                Util.println("");
             }
         }
     }

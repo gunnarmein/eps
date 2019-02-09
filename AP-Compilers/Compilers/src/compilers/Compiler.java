@@ -13,6 +13,9 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import vx86.Program;
+import vx86.Util;
+import vx86.Vx86;
 
 /**
  *
@@ -20,7 +23,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  */
 public class Compiler {
 
-    static void compile(InputStream is) throws IOException {
+    static Program compile(InputStream is) throws IOException {
         CharStream cs = CharStreams.fromStream(is);
         LOLcodeLexer lexer = new LOLcodeLexer(cs);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -28,17 +31,30 @@ public class Compiler {
 
         LOLcodeParser.ProgramContext tree = Parser.parse(lexer, parser, tokens);
         if (tree == null) {
-            return;
+            return null;
         }
+        Util.println("Parsing successful.");
 
         // dump parse tree
-        Dumper dumper = new Dumper();
-        ParseTreeWalker.DEFAULT.walk(dumper, tree);
-        System.out.println("\n\n");
-
+//        Dumper dumper = new Dumper();
+//        ParseTreeWalker.DEFAULT.walk(dumper, tree);
+//        System.out.println("\n\n");
         // decorate tree
-        Checker checker = new Checker();
+        StaticAnalyzer checker = new StaticAnalyzer();
         ParseTreeWalker.DEFAULT.walk(checker, tree);
+        Util.println("Static anaylis successful.");
+
+        // now create a code generator, passing on decorations from checker phase
+        CodeGenerator cgen = new CodeGenerator(checker.decs);
+        ParseTreeWalker.DEFAULT.walk(cgen, tree);
+        Program p = cgen.p;
+        if (p == null) {
+            return null;
+        }
+        Util.println("Parsing successful.");
+
+        p.resolveLabels();
+        return p;
 
     }
 

@@ -6,14 +6,10 @@
 package compilers;
 
 import java.io.IOException;
-import java.io.InputStream;
 import lol.LOLcodeLexer;
 import lol.LOLcodeParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 /**
  *
@@ -40,4 +36,6 @@ public class Parser {
 
         return tree;
     }
+    
+    
 }

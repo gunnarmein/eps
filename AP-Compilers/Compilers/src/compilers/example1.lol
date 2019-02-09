@@ -1,8 +1,9 @@
 hai
+    visible "hai there worldz!"
     obtw this is a multi-line comment
     tldr
 
-    how duz i judge yr animal
+    how duz i judge yr yarn animal
         BOTH SAEM ANIMAL AN "CAT", O RLY?                                       btw expr, if
             YA RLY, VISIBLE "J00 HAV A CAT"                                     btw then
             MEBBE both saem animal an "DOG", visible "joo hav a dog"            btw elseif
@@ -10,7 +11,7 @@ hai
         OIC
     if u say so
 
-    how duz i rly_judge yr animal
+    how duz i rly_judge yr yarn animal
         animal, wtf?                                                            btw switch/case/default
             omg "dog", visible "joo haz dog"
                 gtfo
@@ -24,7 +25,7 @@ hai
     how duz i speak
     if u say so
 
-    how duz i factorial yr n
+    how duz i factorial yr numbr n
         both saem n an 1
         o rly?
             ya rly, found yr 1
@@ -35,8 +36,8 @@ hai
         oic
     if u say so
 
-    how duz i factorial_better yr n
-        i has a result itz 1
+    how duz i factorial_better yr numbr n
+        i has a numbr result itz 1
         n r maek n a numbr
         i'm in yr loop nerfin yr n til both saem n an 1     btw better: "smallr n than 2" or "both saem n an smallr of n an 2"
             result r produkt of result an n
