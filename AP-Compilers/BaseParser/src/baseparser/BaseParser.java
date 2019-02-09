@@ -22,6 +22,7 @@ public class BaseParser {
         Util.debugOff();
         
         Program program = Examples.example_factorial();
+        program.resolveLabels();
         program.dump();
         
         Vx86 vm = new Vx86();
