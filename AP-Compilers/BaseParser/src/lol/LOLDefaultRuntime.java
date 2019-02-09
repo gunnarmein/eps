@@ -5,16 +5,16 @@
  */
 package lol;
 
-import vx86.Runtime;
 import vx86.Util;
 import vx86.Vx86;
 import static vx86.Vx86.RUNTIME_BASE;
+import vx86.RuntimeSupport;
 
 /**
  *
  * @author gmein
  */
-public class LOLDefaultRuntime implements Runtime {
+public class LOLDefaultRuntime implements RuntimeSupport {
 
     @Override
     public boolean isRuntimeRoutine(int addr) {
@@ -48,7 +48,7 @@ public class LOLDefaultRuntime implements Runtime {
     private final RuntimeEntry[] routines = RuntimeEntry.values();
 
     @Override
-    public int getRuntimeAddres(String routine) {
+    public int getRuntimeAddress(String routine) {
         return RuntimeEntry.valueOf(routine).getAddress();
     }
 

@@ -16,16 +16,20 @@ public class Examples {
 
     public static Program example_increment() {
         ArrayList<Instruction> p = new ArrayList<>();
-        StringMap strings = new StringMap();
-        Runtime runtime = new LOLDefaultRuntime();
-        Program program = new Program(p, runtime, strings);
+        RuntimeSupport runtime = new LOLDefaultRuntime();
+        Program program = new Program(p, runtime);
 
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.newStringId("Hello World! 3+1 is:"), "argument for increment"));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.getRuntimeAddress("output"), "call $output"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 3, "argument for increment"));
-        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 3, "call line 5"));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.refLabel("increment"), "call increment"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push result"));
-        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, runtime.getRuntimeAddres("output"), "call $output"));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.getRuntimeAddress("intToString"), "call $output"));
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push result"));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.getRuntimeAddress("output"), "call $output"));
         p.add(new Instruction(Vx86.Inx.RET, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "return to host"));
 
+        program.defLabel("increment");
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.ESP, 0, "establish new frame pointer"));
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, 8, "load first parameter"));
@@ -38,18 +42,17 @@ public class Examples {
 
     public static Program example_factorial() {
         ArrayList<Instruction> p = new ArrayList<>();
-        StringMap strings = new StringMap();
-        Runtime runtime = new LOLDefaultRuntime();
-        Program program = new Program(p, runtime, strings);
+        RuntimeSupport runtime = new LOLDefaultRuntime();
+        Program program = new Program(p, runtime);
 
-        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, strings.newStringId("Hello World! 10! is:")));
-        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, runtime.getRuntimeAddres("output"), "call $output"));
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, program.newStringId("Hello World! 10! is:")));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.getRuntimeAddress("output"), "call $output"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 10, "main program calculates 10! and prints it"));
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.refLabel("factorial"), "call factorial"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
-        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, runtime.getRuntimeAddres("intToString"), "call $intToString"));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.getRuntimeAddress("intToString"), "call $intToString"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
-        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, runtime.getRuntimeAddres("output"), "call $output"));
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, program.getRuntimeAddress("output"), "call $output"));
         p.add(new Instruction(Vx86.Inx.RET, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
 
         program.defLabel("factorial");

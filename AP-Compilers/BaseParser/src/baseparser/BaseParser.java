@@ -18,17 +18,27 @@ import vx86.Util;
 public class BaseParser {
 
     public static void main(String[] args) throws IOException {
-        
+
         Util.debugOff();
-        
-        Program program = Examples.example_factorial();
-        program.resolveLabels();
-        program.dump();
-        
+
+        Program program1 = Examples.example_increment();
+        program1.resolveLabels();
+        program1.dump();
+
         Vx86 vm = new Vx86();
-        vm.setup(program);
+        vm.setup(program1);
         vm.run();
-        
+
+        System.out.println("");
+        System.out.println("");
+
+        Program program2 = Examples.example_factorial();
+        program2.resolveLabels();
+        program2.dump();
+
+        vm.setup(program2);
+        vm.run();
+
         //Compiler.compile (BaseParser.class.getResourceAsStream("example1.lol"));
     }
 

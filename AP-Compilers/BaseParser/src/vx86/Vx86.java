@@ -72,7 +72,7 @@ public class Vx86 {
     //
     public Program program;
     public StringMap strings;
-    public Runtime runtime;
+    public RuntimeSupport runtime;
 
     public int eip;
     public HashMap<Reg, Integer> regs;

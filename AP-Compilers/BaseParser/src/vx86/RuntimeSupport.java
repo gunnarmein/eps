@@ -11,8 +11,8 @@ import vx86.Vx86;
  *
  * @author gmein
  */
-  public interface Runtime {
-        int getRuntimeAddres(String routine);
+  public interface RuntimeSupport {
+        int getRuntimeAddress(String routine);
 
         void invokeRoutine(Vx86 vm, int addr);
         

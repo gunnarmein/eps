@@ -16,14 +16,22 @@ public class Program {
 
     ArrayList<Instruction> instructions;
     StringMap strings;
-    Runtime runtime;
+    RuntimeSupport runtime;
     HashMap<String, Label> labels;
 
-    Program(ArrayList<Instruction> list, Runtime runtime, StringMap strings) {
+    public Program(ArrayList<Instruction> list, RuntimeSupport runtime) {
         this.instructions = list;
-        this.strings = strings;
+        this.strings = new StringMap();
         this.runtime = runtime;
         this.labels = new HashMap<>();
+    }
+    
+    public int newStringId(String s) {
+        return strings.newStringId(s);
+    }
+    
+    public int getRuntimeAddress(String routine) {
+        return runtime.getRuntimeAddress(routine);
     }
 
     public void defLabel(String name) {
