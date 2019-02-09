@@ -28,7 +28,7 @@ public class MrOwen extends EPSPerson implements Electrician {
 
     @Override
     public void fixLights() {
-        System.out.println("Random number : "+random.nextInt());
+        System.out.println("Random number : "+2);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
