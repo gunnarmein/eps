@@ -1,4 +1,4 @@
-// Generated from c:\Users\gmein\Documents\NetBeansProjects\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
+// Generated from c:\Users\gmein\Documents\GitHub\eps\AP-Compilers\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
 
    package lol;
 
@@ -180,6 +180,12 @@ public interface LOLcodeVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArgs_decl(LOLcodeParser.Args_declContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link LOLcodeParser#return_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturn_type(LOLcodeParser.Return_typeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link LOLcodeParser#func_decl}.
 	 * @param ctx the parse tree

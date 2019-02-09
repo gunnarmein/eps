@@ -6,6 +6,7 @@
 package baseparser;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  *
@@ -14,12 +15,14 @@ import java.io.IOException;
 public class BaseParser {
 
     public static void main(String[] args) throws IOException {
-        parseExpr();
-    }
-
-    static void parseExpr() throws IOException {
-        //expr.MyExprParser.parse(BaseParser.class.getResourceAsStream("example1.xpr"));
-        Compiler.compile (BaseParser.class.getResourceAsStream("example1.lol"));
+        ArrayList<Vx86.Instruction> program = Vx86Examples.example_factorial();
+        Vx86.dump(program);
+        
+        Vx86 vm = new Vx86();
+        vm.setup();
+        vm.run(program);
+        
+        //Compiler.compile (BaseParser.class.getResourceAsStream("example1.lol"));
     }
 
 }

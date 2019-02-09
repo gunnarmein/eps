@@ -1,4 +1,4 @@
-// Generated from c:\Users\gmein\Documents\NetBeansProjects\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
+// Generated from c:\Users\gmein\Documents\GitHub\eps\AP-Compilers\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
 
    package lol;
 
@@ -209,6 +209,13 @@ public class LOLcodeBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitArgs_decl(LOLcodeParser.Args_declContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitReturn_type(LOLcodeParser.Return_typeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

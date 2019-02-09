@@ -32,7 +32,7 @@ hai
                 i duz factorial yr diff of n an 1
                 found yr produkt of it an n
                 btw found yr produkt of n an factorial yr diff of n an 1
-    oic
+        oic
     if u say so
 
     how duz i factorial_better yr n

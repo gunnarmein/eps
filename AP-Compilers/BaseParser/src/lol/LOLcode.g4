@@ -31,6 +31,7 @@ FAIL: 'fail' | 'FAIL';
 NUMBR: 'numbr'|'NUMBR';
 NUMBAR: 'numbar'|'NUMBAR';
 YARN: 'yarn' |'YARN';
+INTO: 'into' |'INTO';
 SUM: 'sum' | 'SUM';
 DIFF: 'diff' | 'DIFF';
 PRODUKT: 'produkt' | 'PRODUKT';
@@ -67,7 +68,7 @@ IF: 'if' | 'IF';
 U: 'u' | 'U';
 SAY: 'say' | 'SAY';
 SO: 'so' | 'SO';
-IM: 'i\'m' | 'I\'M';
+IM: 'i\'m' | 'I\'M' | 'I\'m';
 IN: 'in' | 'IN';
 OUTTA: 'outta' | 'OUTTA';
 TIL: 'til' | 'TIL';
@@ -161,7 +162,8 @@ var_assignment: IDENTIFIER R expr;
 arg_decl: YR IDENTIFIER;
 more_args_decl: (AN arg_decl)* MKAY;
 args_decl: arg_decl more_args_decl?;
-func_decl: HOW (IZ|DUZ) I IDENTIFIER args_decl? separator+ (block separator+)? IF U SAY SO;
+return_type: INTO vartype;
+func_decl: HOW (IZ|DUZ) I IDENTIFIER args_decl? return_type? separator+ (block separator+)? IF U SAY SO;
 
 // function return
 return_statement: (FOUND YR expr) | GTFO;
@@ -189,11 +191,11 @@ adefault: OMGWTF separator+ block;
 // if / then / else
 
 
-anif: O RLY QUESTION separator;
-then: YA RLY separator block;
-elseif: MEBBE expr separator block;
-anelse: NO WAI separator block;
-ifthenelseifelse: anif then (separator elseif)* (separator anelse)? separator  OIC;
+anif: O RLY QUESTION;
+then: YA RLY separator+ block;
+elseif: MEBBE expr separator+ block;
+anelse: NO WAI separator+ block;
+ifthenelseifelse: anif separator+ then (separator+ elseif)* (separator+ anelse)? separator+  OIC;
 
 // input / output
 

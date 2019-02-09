@@ -1,4 +1,4 @@
-// Generated from c:\Users\gmein\Documents\NetBeansProjects\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
+// Generated from c:\Users\gmein\Documents\GitHub\eps\AP-Compilers\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
 
    package lol;
 
@@ -289,6 +289,16 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArgs_decl(LOLcodeParser.Args_declContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#return_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturn_type(LOLcodeParser.Return_typeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#return_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturn_type(LOLcodeParser.Return_typeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#func_decl}.
 	 * @param ctx the parse tree

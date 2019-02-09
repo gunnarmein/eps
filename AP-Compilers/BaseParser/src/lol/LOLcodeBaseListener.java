@@ -1,4 +1,4 @@
-// Generated from c:\Users\gmein\Documents\NetBeansProjects\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
+// Generated from c:\Users\gmein\Documents\GitHub\eps\AP-Compilers\BaseParser\src\lol\LOLcode.g4 by ANTLR 4.7.1
 
    package lol;
 
@@ -349,6 +349,18 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArgs_decl(LOLcodeParser.Args_declContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterReturn_type(LOLcodeParser.Return_typeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitReturn_type(LOLcodeParser.Return_typeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
