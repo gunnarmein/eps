@@ -10,6 +10,7 @@ import lol.LOLcodeParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import vx86.Util;
 
 /**
  *
@@ -17,16 +18,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 public class Dumper extends LOLcodeBaseListener {
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-
+ 
     int level;
     ParseTree parent;
 
@@ -75,7 +67,7 @@ public class Dumper extends LOLcodeBaseListener {
             System.out.println(spaces(level));
             parent = node.getParent();
         }
-        System.out.print(" " + ANSI_BLUE + node.getText() + ANSI_RESET);
+        System.out.print(" " + Util.ANSI_BLUE + node.getText() + Util.ANSI_RESET);
     }
 
 }

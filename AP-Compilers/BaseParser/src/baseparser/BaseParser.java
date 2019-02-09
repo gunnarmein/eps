@@ -5,8 +5,11 @@
  */
 package baseparser;
 
+import vx86.Examples;
+import vx86.Vx86;
 import java.io.IOException;
-import java.util.ArrayList;
+import vx86.Program;
+import vx86.Util;
 
 /**
  *
@@ -15,12 +18,15 @@ import java.util.ArrayList;
 public class BaseParser {
 
     public static void main(String[] args) throws IOException {
-        ArrayList<Vx86.Instruction> program = Vx86Examples.example_factorial();
-        Vx86.dump(program);
+        
+        Util.debugOff();
+        
+        Program program = Examples.example_factorial();
+        program.dump();
         
         Vx86 vm = new Vx86();
-        vm.setup();
-        vm.run(program);
+        vm.setup(program);
+        vm.run();
         
         //Compiler.compile (BaseParser.class.getResourceAsStream("example1.lol"));
     }
