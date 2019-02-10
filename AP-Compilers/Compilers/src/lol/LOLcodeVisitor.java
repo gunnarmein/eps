@@ -199,6 +199,12 @@ public interface LOLcodeVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturn_statement(LOLcodeParser.Return_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link LOLcodeParser#naked_arg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNaked_arg(LOLcodeParser.Naked_argContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link LOLcodeParser#arg}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

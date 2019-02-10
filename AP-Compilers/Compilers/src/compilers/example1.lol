@@ -1,5 +1,7 @@
 hai
-    visible "this is ", 3, " and ", 3.1415 MKAY
+    visible produkt of 2 an 7
+    visible diff of 4 an 5
+    visible "this is ", 3, " and ", 3.1415, " and ", diff of 4 an 5 MKAY
     obtw this is a multi-line comment
 
 

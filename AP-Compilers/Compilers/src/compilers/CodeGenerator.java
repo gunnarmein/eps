@@ -9,12 +9,9 @@ import java.util.ArrayList;
 import lol.LOLDefaultRuntime;
 import lol.LOLcodeBaseListener;
 import lol.LOLcodeParser;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import vx86.Instruction;
 import vx86.Program;
-import vx86.Util;
 import vx86.Vx86;
 
 /**
@@ -44,7 +41,8 @@ public class CodeGenerator extends LOLcodeBaseListener {
         p.add(new Instruction(Vx86.Inx.SUB, Vx86.Mode.REGISTER, Vx86.Reg.ESP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, dec.getNumVariables() * 4, "room for locals"));
 
         // print start message
-        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.newStringId("LOLCode program started"), "print start message"));
+        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, p.newStringId("LOLCode main program started"), "string id of start message"));
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push argument"));
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("output"), "call $output"));
 
     }
@@ -52,8 +50,11 @@ public class CodeGenerator extends LOLcodeBaseListener {
     @Override
     public void exitProgram(LOLcodeParser.ProgramContext ctx) {
         // print start message
-        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.newStringId("LOLCode program finished"), "print end message"));
+        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, p.newStringId("LOLCode main program finished"), "string id of end message"));
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push argument"));
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("output"), "call $output"));
+      
+        // kill frame and exit
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "kill frame"));
         p.add(new Instruction(Vx86.Inx.RET, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "return to host"));
     }
@@ -114,6 +115,11 @@ public class CodeGenerator extends LOLcodeBaseListener {
     }
 
     @Override
+    public void exitNaked_arg(LOLcodeParser.Naked_argContext ctx) {
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push arg"));
+    }
+
+    @Override
     public void enterOutput_args(LOLcodeParser.Output_argsContext ctx) {
     }
 
@@ -156,5 +162,19 @@ public class CodeGenerator extends LOLcodeBaseListener {
                 // not sure how we are here
                 throw new IllegalArgumentException();
         }
+    }
+
+    @Override
+    public void exitDiff(LOLcodeParser.DiffContext ctx) {
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 1"));
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 2"));
+        p.add(new Instruction(Vx86.Inx.SUB, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
+    }
+
+    @Override
+    public void exitProduct(LOLcodeParser.ProductContext ctx) {
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 1"));
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 2"));
+        p.add(new Instruction(Vx86.Inx.MUL, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
     }
 }

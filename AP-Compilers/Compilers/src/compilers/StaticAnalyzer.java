@@ -7,7 +7,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import vx86.Instruction;
 import vx86.Util;
+import vx86.Vx86;
 
 /**
  *
@@ -86,37 +88,6 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         System.out.println("Using variable in expression: " + ctx.getTokens(LOLcodeParser.IDENTIFIER));
     }
 
-    private void setTypeFromChildren(ParserRuleContext ctx) {
-        // put up the type, and any constant it might have
-        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
-        Util.println("Setting type for " + ctx.getClass().getName());
-
-        // type upward propagation: if all subnodes have same type, make that ours
-        for (int i = 0; i < ctx.getChildCount(); i++) {
-            ParseTree child = ctx.getChild(i);
-            ExprDecoration decChild = (ExprDecoration) decs.get(child);
-            if (decChild == null) {
-                // something went wrong
-                Util.println("undecorated sub-expression in upward promotion");
-                throw new IllegalArgumentException();
-            }
-            if (dec.type == Variable.Type.NULL) {
-                // our expression is still undecided, record the child node's type here
-                dec.type = decChild.type;
-            } else {
-                // our type is already set, is it the same?
-                if (dec.type != decChild.type) {
-                    Util.println("type mismatch in " + ctx.getStart().getLine());
-                }
-            }
-        }
-        if (dec.type != Variable.Type.NULL) {
-            Util.println("  success, set to " + dec.type);
-        } else {
-            Util.println("  failed");
-        }
-    }
-
     @Override
     public void exitAtom(LOLcodeParser.AtomContext ctx) {
         // put up the type, and any constant it might have
@@ -125,15 +96,11 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         setTypeFromChildren(ctx);
     }
 
-     @Override
+    @Override
     public void enterOutput_args(LOLcodeParser.Output_argsContext ctx) {
         // put up the type, and any constant it might have
         OutputArgListDecoration dec = new OutputArgListDecoration(ctx);
         decs.put(ctx, dec);
-    }
-    
-    @Override
-    public void exitOutput_args(LOLcodeParser.Output_argsContext ctx) {
     }
 
     @Override
@@ -142,7 +109,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         ExprDecoration dec = new ExprDecoration(ctx);
         decs.put(ctx, dec);
         setTypeFromChildren(ctx);
-        
+
         // count this argument in the list
         OutputArgListDecoration decList = OutputArgListDecoration.find(decs, ctx);
         decList.numArgs++;
@@ -185,6 +152,90 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
             default:
                 // not sure how we are here
                 throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void enterDiff(LOLcodeParser.DiffContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+    }
+
+    @Override
+    public void exitDiff(LOLcodeParser.DiffContext ctx) {
+        // get decoration, promote types
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        setTypeFromChildren(ctx);
+
+        // has to be numeric
+        if (dec.type != Variable.Type.FLOAT && dec.type != Variable.Type.INTEGER) {
+            Util.println("Illegal type for diff at " + ctx.getStart().getLine());
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void enterProduct(LOLcodeParser.ProductContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+    }
+
+    @Override
+    public void exitProduct(LOLcodeParser.ProductContext ctx) {
+        // get decoration, promote types
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        setTypeFromChildren(ctx);
+
+        // has to be numeric
+        if (dec.type != Variable.Type.FLOAT && dec.type != Variable.Type.INTEGER) {
+            Util.println("Illegal type for diff at " + ctx.getStart().getLine());
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void enterNaked_arg(LOLcodeParser.Naked_argContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+    }
+
+    @Override
+    public void exitNaked_arg(LOLcodeParser.Naked_argContext ctx) {
+        // get decoration, promote types
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        setTypeFromChildren(ctx);
+    }
+
+    private void setTypeFromChildren(ParserRuleContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        Util.println("Setting type for " + ctx.getClass().getName());
+
+        // type upward propagation: if all subnodes have same type, make that ours
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree child = ctx.getChild(i);
+            ExprDecoration decChild = (ExprDecoration) decs.get(child);
+            if (decChild == null) {
+                continue;
+            }
+            if (dec.type == Variable.Type.NULL) {
+                // our expression is still undecided, record the child node's type here
+                dec.type = decChild.type;
+            } else {
+                // our type is already set, is it the same?
+                if (dec.type != decChild.type) {
+                    Util.println("type mismatch in " + ctx.getStart().getLine());
+                }
+            }
+        }
+        if (dec.type != Variable.Type.NULL) {
+            Util.println("  success, set to " + dec.type);
+        } else {
+            Util.println("  failed");
+            throw new IllegalArgumentException();
         }
     }
 

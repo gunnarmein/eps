@@ -390,6 +390,18 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterNaked_arg(LOLcodeParser.Naked_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNaked_arg(LOLcodeParser.Naked_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterArg(LOLcodeParser.ArgContext ctx) { }
 	/**
 	 * {@inheritDoc}

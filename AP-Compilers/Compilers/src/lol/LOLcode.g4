@@ -117,24 +117,24 @@ vartype: NUMBR | NUMBAR | YARN | TROOF |NOOB;
 
 // expressions
 
-sum: SUM OF expr AN expr;
-diff:  DIFF OF expr AN expr ;
-product:   PRODUKT OF expr AN expr ;
-quotient:   QUOSHUNT OF expr AN expr ;
-bigger: IZ BIGGR expr THAN expr;
-smallr: IZ SMALLR expr THAN expr;
-min: SMALLR OF expr AN expr;
-max: BIGGR OF expr AN expr;
-mod:   MOD OF expr AN expr ;
-not:   NOT expr ;
-same:    BOTH (SAEM | DIFFRINT) expr AN expr ;
-and:   BOTH OF expr AN expr ;
-either:   EITHER OF expr AN expr ;
-one:   WON OF expr AN expr ;
-all:   ALL OF expr (AN expr)* MKAY;
-any:   ANY expr (AN expr)* MKAY;
-concat: SMOOSH expr ((AN|COMMA) expr)* MKAY;
-cast: MAEK expr A vartype;
+sum: SUM OF naked_arg AN naked_arg;
+diff:  DIFF OF naked_arg AN naked_arg;
+product:   PRODUKT OF naked_arg AN naked_arg ;
+quotient:   QUOSHUNT OF naked_arg AN naked_arg ;
+bigger: IZ BIGGR naked_arg THAN naked_arg;
+smallr: IZ SMALLR naked_arg THAN naked_arg;
+min: SMALLR OF naked_arg AN naked_arg;
+max: BIGGR OF naked_arg AN naked_arg;
+mod:   MOD OF naked_arg AN naked_arg ;
+not:   NOT naked_arg ;
+same:    BOTH (SAEM | DIFFRINT) naked_arg AN naked_arg ;
+and:   BOTH OF naked_arg AN naked_arg ;
+either:   EITHER OF naked_arg AN naked_arg ;
+one:   WON OF naked_arg AN naked_arg ;
+all:   ALL OF naked_arg (AN naked_arg)* MKAY;
+any:   ANY naked_arg (AN naked_arg)* MKAY;
+concat: SMOOSH naked_arg ((AN|COMMA) naked_arg)* MKAY;
+cast: MAEK naked_arg A vartype;
 var_ref: IDENTIFIER;
 
 
@@ -173,7 +173,8 @@ func_decl: HOW (IZ|DUZ) I IDENTIFIER args_decl? return_type? separator+ (block s
 return_statement: (FOUND YR expr) | GTFO;
 
 //function call
-arg: YR expr;
+naked_arg: expr;
+arg: YR naked_arg;
 more_args: (AN arg)* MKAY;
 args: arg more_args?;
 func_call: I (DUZ|IZ) IDENTIFIER args;

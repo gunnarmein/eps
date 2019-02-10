@@ -320,6 +320,16 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 */
 	void exitReturn_statement(LOLcodeParser.Return_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#naked_arg}.
+	 * @param ctx the parse tree
+	 */
+	void enterNaked_arg(LOLcodeParser.Naked_argContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#naked_arg}.
+	 * @param ctx the parse tree
+	 */
+	void exitNaked_arg(LOLcodeParser.Naked_argContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#arg}.
 	 * @param ctx the parse tree
 	 */

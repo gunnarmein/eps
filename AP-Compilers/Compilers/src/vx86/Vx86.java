@@ -252,6 +252,8 @@ public class Vx86 {
                     // is stack empty? return to 
                     stack = readRegister(Reg.ESP);
                     if (stack == memory.length * 4) {
+                        Util.println("");
+                        Util.println("VM: Program run finished");
                         return;
                     }
                     eip = pop();
