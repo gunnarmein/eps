@@ -37,24 +37,36 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         // put up new scope
         ScopeDecoration scope = new ScopeDecoration(ctx);
         decs.put(ctx, scope);
-        scope.addVariable("IT", "null");
+        scope.addVariable("IT", Variable.Type.NULL);
     }
 
     @Override
     public void enterFunc_decl(LOLcodeParser.Func_declContext ctx) {
         String name = ctx.getTokens(LOLcodeParser.IDENTIFIER).get(0).getText();
 
-        // put up new scope
-        Util.println("Entering function declaration for " + name);
+        // make a new scope
+        //Util.println("Entering function declaration for " + name);
         FunctionDecoration dec = new FunctionDecoration(ctx, name);
-        decs.put(ctx, dec);
 
+        // now find the responsible scope and register the function
+        ScopeDecoration scope = ScopeDecoration.find(decs, ctx);
+        scope.addFunction(ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText(), dec);
+
+        // register the new scope
+        decs.put(ctx, dec);
+    }
+
+    @Override
+    public void enterReturn_type(LOLcodeParser.Return_typeContext ctx) {
+        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        String type = ((TerminalNode)ctx.getChild(1).getChild(0)).getText();
+        dec.returnType = Variable.typeFromTypeName(type);
     }
 
     @Override
     public void exitFunc_decl(LOLcodeParser.Func_declContext ctx) {
         FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
-        Util.println("Exiting function declaration for " + dec.name + ", counted " + dec.numArgs + " arguments");
+        //Util.println("Exiting function declaration for " + dec.name + ", counted " + dec.numArgs + " arguments");
     }
 
     @Override
@@ -68,9 +80,9 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
         // now find the responsible scope and register the variable
         ScopeDecoration scope = ScopeDecoration.find(decs, ctx);
-        scope.addVariable(ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText(), type);
+        scope.addVariable(ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText(), Variable.typeFromTypeName(type));
 
-        Util.println("registered variable " + name + " with type " + type);
+        //Util.println("registered variable " + name + " with type " + type);
     }
 
     @Override

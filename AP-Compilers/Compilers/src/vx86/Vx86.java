@@ -253,7 +253,7 @@ public class Vx86 {
                     stack = readRegister(Reg.ESP);
                     if (stack == memory.length * 4) {
                         Util.println("");
-                        Util.println("VM: Program run finished");
+                        Util.println(Util.ANSI_GREEN+"VM: Program run finished"+Util.ANSI_RESET);
                         return;
                     }
                     eip = pop();

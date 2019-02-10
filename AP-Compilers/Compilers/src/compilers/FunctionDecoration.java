@@ -15,11 +15,13 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 public class FunctionDecoration extends ScopeDecoration{
     public int numArgs;
     public String name;
+    public Variable.Type returnType;
     
     FunctionDecoration(ParseTree ctx, String name) {
         super(ctx);
         this.name = name;
         this.numArgs = 0;
+        this.returnType = Variable.Type.NULL;
     }
     
     

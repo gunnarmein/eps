@@ -2,10 +2,14 @@ hai
     i has a numbr variable itz 5
     visible variable
     i has a yarn text
-    gimmeh text
+    //gimmeh text
     visible text
     text r "blue"
     visible text
+
+    how duz i speak into numbr
+    if u say so
+
 
     obtw this is a multi-line comment
 
@@ -29,9 +33,7 @@ hai
         oic
     if u say so
 
-    how duz i speak
-    if u say so
-
+ 
     how duz i factorial yr numbr n
         both saem n an 1
         o rly?
@@ -45,7 +47,6 @@ hai
 
     how duz i factorial_better yr numbr n
         i has a numbr result itz 1
-        n r maek n a numbr
         i'm in yr loop nerfin yr n til both saem n an 1     btw better: "smallr n than 2" or "both saem n an smallr of n an 2"
             result r produkt of result an n
         i'm outta yr loop
