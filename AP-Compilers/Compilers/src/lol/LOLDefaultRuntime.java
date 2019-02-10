@@ -89,7 +89,7 @@ public class LOLDefaultRuntime implements RuntimeSupport {
                 
             case input:
                 Util.println("");
-                Util.print(Util.ANSI_GREEN + "Vx86 input:"+Util.ANSI_BLUE);
+                Util.print(Util.ANSI_GREEN + "Program waiting for input:"+Util.ANSI_BLUE);
                 System.out.println();
                 Scanner sc = new Scanner(System.in);
                 s = sc.nextLine();

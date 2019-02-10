@@ -4,6 +4,8 @@ hai
     i has a yarn text
     gimmeh text
     visible text
+    text r "blue"
+    visible text
 
     obtw this is a multi-line comment
 

@@ -217,4 +217,19 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     }
 
+    @Override
+    public void exitVar_assignment(LOLcodeParser.Var_assignmentContext ctx) {
+        Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
+        if (v == null) {
+            Util.println("Unknown variable for assignment: " + v.name);
+            throw new IllegalArgumentException();
+        }
+        if (v.type != Variable.Type.STRING) {
+            Util.println("Type mismatch for assignment: " + v.name);
+            throw new IllegalArgumentException();
+        }
+
+        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, -(v.ordinal + 1) * 4, "store \"" + v.name + "\""));
+    }
+
 }
