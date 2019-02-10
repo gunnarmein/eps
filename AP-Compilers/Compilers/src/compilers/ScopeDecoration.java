@@ -29,7 +29,7 @@ public class ScopeDecoration extends Decoration {
     public void addVariable(String name, String type) {
         Variable.Type t;
 
-        if (vars.containsKey(name)) {
+        if (!name.equalsIgnoreCase("it") && vars.containsKey(name)) {
             throw new IllegalArgumentException();
         }
 
@@ -46,7 +46,7 @@ public class ScopeDecoration extends Decoration {
             case "troof":
                 t = Variable.Type.BOOLEAN;
                 break;
-
+            case "null":
             default:
                 t = Variable.Type.NULL;
         }
@@ -54,6 +54,36 @@ public class ScopeDecoration extends Decoration {
         Variable var = new Variable(name, this.vars.size(), t);
         vars.put(name, var);
     }
+    
+        public void addParameter(String name, String type, int ordinal) {
+        Variable.Type t;
+
+        if (!name.equalsIgnoreCase("it") && vars.containsKey(name)) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (type) {
+            case "numbr":
+                t = Variable.Type.INTEGER;
+                break;
+            case "numbar":
+                t = Variable.Type.FLOAT;
+                break;
+            case "yarn":
+                t = Variable.Type.STRING;
+                break;
+            case "troof":
+                t = Variable.Type.BOOLEAN;
+                break;
+            case "null":
+            default:
+                t = Variable.Type.NULL;
+        }
+
+        Variable var = new Variable(name, ordinal, t);
+        vars.put(name, var);
+    }
+
 
     static ScopeDecoration find(ParseTreeProperty<Decoration> decs, ParseTree ctx) {
         Decoration dec = Decoration.find(decs, ctx, ScopeDecoration.class);

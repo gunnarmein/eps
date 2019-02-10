@@ -1,7 +1,7 @@
 hai
-    visible produkt of 2 an 7
-    visible diff of 4 an 5
-    visible "this is ", 3, " and ", 3.1415, " and ", diff of 4 an 5 MKAY
+    i has a numbr variable itz 5
+    visible variable
+
     obtw this is a multi-line comment
 
 
@@ -58,8 +58,7 @@ hai
     visible "haz a numbr?"
     gimmeh k
     i duz factorial yr k
-    visible smoosh "found yr faktorial of " an k an ", itz " an it mkay
-    visible smoosh "found yr faktorial_better of " an k an ", itz " an it mkay
-
+    visible  "found yr faktorial_better of ", k, ", itz " , it mkay
     tldr
+
 kthxbye

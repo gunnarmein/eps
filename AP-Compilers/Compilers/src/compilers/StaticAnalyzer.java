@@ -7,9 +7,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import vx86.Instruction;
 import vx86.Util;
-import vx86.Vx86;
 
 /**
  *
@@ -39,6 +37,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         // put up new scope
         ScopeDecoration scope = new ScopeDecoration(ctx);
         decs.put(ctx, scope);
+        scope.addVariable("IT", "null");
     }
 
     @Override
@@ -75,6 +74,21 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     }
 
     @Override
+    public void exitVar_decl(LOLcodeParser.Var_declContext ctx) {
+        Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
+
+        // does it have an initializer?
+        if (ctx.getChildCount() == 7) {
+            LOLcodeParser.ExprContext expr = (LOLcodeParser.ExprContext) ctx.children.get(6);
+            ExprDecoration decInit = (ExprDecoration) decs.get(expr);
+            if (v.type != decInit.type) {
+                Util.println("type mismatch in variable initialization at " + expr.getStart().getLine());
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    @Override
     public void enterArg_decl(LOLcodeParser.Arg_declContext ctx) {
         // to do: Register this arg in the function's scope
         // put up new scope
@@ -84,15 +98,25 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
     @Override
     public void enterVar_ref(LOLcodeParser.Var_refContext ctx) {
-        // to do: walk up tree, checking for scopes, searching those for variables
-        System.out.println("Using variable in expression: " + ctx.getTokens(LOLcodeParser.IDENTIFIER));
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+
+        Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
+        dec.type = v.type;
+    }
+
+    @Override
+    public void enterAtom(LOLcodeParser.AtomContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
     }
 
     @Override
     public void exitAtom(LOLcodeParser.AtomContext ctx) {
         // put up the type, and any constant it might have
-        ExprDecoration dec = new ExprDecoration(ctx);
-        decs.put(ctx, dec);
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
         setTypeFromChildren(ctx);
     }
 
@@ -212,7 +236,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     private void setTypeFromChildren(ParserRuleContext ctx) {
         // put up the type, and any constant it might have
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
-        Util.println("Setting type for " + ctx.getClass().getName());
+        //Util.println("Setting type for " + ctx.getClass().getName());
 
         // type upward propagation: if all subnodes have same type, make that ours
         for (int i = 0; i < ctx.getChildCount(); i++) {
@@ -232,9 +256,9 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
             }
         }
         if (dec.type != Variable.Type.NULL) {
-            Util.println("  success, set to " + dec.type);
+            //Util.println("  success, set to " + dec.type);
         } else {
-            Util.println("  failed");
+            //Util.println("  failed");
             throw new IllegalArgumentException();
         }
     }
