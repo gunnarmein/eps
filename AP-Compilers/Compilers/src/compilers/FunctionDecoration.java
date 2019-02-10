@@ -25,6 +25,16 @@ public class FunctionDecoration extends ScopeDecoration {
         this.returnType = Variable.Type.NULL;
     }
 
+    public void addParameter(String name, Variable.Type type) {
+        if (!name.equalsIgnoreCase("it") && vars.containsKey(name)) {
+            throw new IllegalArgumentException();
+        }
+
+        this.numArgs++;
+        Variable var = new Variable(name, numArgs+1, type);
+        this.vars.put(name, var);
+    }
+
     static FunctionDecoration find(ParseTreeProperty<Decoration> decs, ParseTree ctx) {
         Decoration dec = Decoration.find(decs, ctx, FunctionDecoration.class);
         if (dec != null) {

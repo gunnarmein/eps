@@ -159,7 +159,8 @@ expr: sum |
 
 // variables and assignment
 var_decl: I HAS A vartype IDENTIFIER (ITZ expr)?;
-var_assignment: IDENTIFIER R expr;
+var_rvalue: IDENTIFIER;
+var_assignment: var_rvalue R expr;
 
 
 // function declaration
@@ -182,9 +183,10 @@ func_call: I (DUZ|IZ) IDENTIFIER args?;
 // loops
 
 
-verb: UPPIN | NERFIN;
-loop_action: verb YR IDENTIFIER;
-loop: IM IN YR IDENTIFIER loop_action (TIL|WILE) expr separator+ block separator+ IM OUTTA YR IDENTIFIER;
+loop_action: (UPPIN | NERFIN) YR var_rvalue;
+loop_condition: (TIL|WILE) expr;
+loop_end: IM OUTTA YR;
+loop: IM IN YR IDENTIFIER loop_action loop_condition separator+ block separator+ loop_end IDENTIFIER;
 
 // switch / case
 
@@ -204,7 +206,7 @@ ifthenelseifelse: anif separator+ then (separator+ elseif)* (separator+ anelse)?
 
 // input / output. have arguments explcitily called out so we can convert to string in code generation phase
 
-input: GIMMEH IDENTIFIER;
+input: GIMMEH var_rvalue;
 output_arg: expr;
 output_args: output_arg? ((COMMA output_arg)* MKAY)?;
 output: VISIBLE output_args EXCLAMATION?;

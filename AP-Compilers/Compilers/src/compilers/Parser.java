@@ -10,6 +10,7 @@ import lol.LOLcodeLexer;
 import lol.LOLcodeParser;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
+import vx86.Util;
 
 /**
  *
@@ -27,7 +28,7 @@ public class Parser {
 
         if (!errorListener.getSyntaxErrors().isEmpty()) {
             for (SyntaxError e : errorListener.getSyntaxErrors()) {
-                System.out.println("Syntax error: Line " + e.getLine() + ": " + e.getMessage());
+                System.out.println(Util.ANSI_RED+"Syntax error: Line " + e.getLine() + ": " + e.getMessage()+Util.ANSI_RESET);
             }
             return null;
         }

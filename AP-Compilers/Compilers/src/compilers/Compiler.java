@@ -42,6 +42,9 @@ public class Compiler {
         // decorate tree
         StaticAnalyzer checker = new StaticAnalyzer();
         ParseTreeWalker.DEFAULT.walk(checker, tree);
+        if (checker.errors != 0) {
+            return null;
+        }
         Util.println("Static analysis successful.");
 
         // now create a code generator, passing on decorations from checker phase
@@ -55,7 +58,5 @@ public class Compiler {
 
         p.resolveLabels();
         return p;
-
     }
-
 }

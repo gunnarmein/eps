@@ -157,6 +157,12 @@ public interface LOLcodeVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVar_decl(LOLcodeParser.Var_declContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link LOLcodeParser#var_rvalue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVar_rvalue(LOLcodeParser.Var_rvalueContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link LOLcodeParser#var_assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -229,17 +235,23 @@ public interface LOLcodeVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunc_call(LOLcodeParser.Func_callContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link LOLcodeParser#verb}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVerb(LOLcodeParser.VerbContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link LOLcodeParser#loop_action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitLoop_action(LOLcodeParser.Loop_actionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link LOLcodeParser#loop_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLoop_condition(LOLcodeParser.Loop_conditionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link LOLcodeParser#loop_end}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLoop_end(LOLcodeParser.Loop_endContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link LOLcodeParser#loop}.
 	 * @param ctx the parse tree

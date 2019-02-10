@@ -250,6 +250,16 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 */
 	void exitVar_decl(LOLcodeParser.Var_declContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#var_rvalue}.
+	 * @param ctx the parse tree
+	 */
+	void enterVar_rvalue(LOLcodeParser.Var_rvalueContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#var_rvalue}.
+	 * @param ctx the parse tree
+	 */
+	void exitVar_rvalue(LOLcodeParser.Var_rvalueContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#var_assignment}.
 	 * @param ctx the parse tree
 	 */
@@ -370,16 +380,6 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 */
 	void exitFunc_call(LOLcodeParser.Func_callContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LOLcodeParser#verb}.
-	 * @param ctx the parse tree
-	 */
-	void enterVerb(LOLcodeParser.VerbContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link LOLcodeParser#verb}.
-	 * @param ctx the parse tree
-	 */
-	void exitVerb(LOLcodeParser.VerbContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#loop_action}.
 	 * @param ctx the parse tree
 	 */
@@ -389,6 +389,26 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLoop_action(LOLcodeParser.Loop_actionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#loop_condition}.
+	 * @param ctx the parse tree
+	 */
+	void enterLoop_condition(LOLcodeParser.Loop_conditionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#loop_condition}.
+	 * @param ctx the parse tree
+	 */
+	void exitLoop_condition(LOLcodeParser.Loop_conditionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#loop_end}.
+	 * @param ctx the parse tree
+	 */
+	void enterLoop_end(LOLcodeParser.Loop_endContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#loop_end}.
+	 * @param ctx the parse tree
+	 */
+	void exitLoop_end(LOLcodeParser.Loop_endContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#loop}.
 	 * @param ctx the parse tree

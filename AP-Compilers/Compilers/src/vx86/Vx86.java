@@ -65,8 +65,6 @@ public class Vx86 {
         JMP,
     }
 
-    
-
     //
     // machine state
     //
@@ -208,13 +206,14 @@ public class Vx86 {
         while (eip >= 0 && eip < program.instructions.size()) {
             //dumpRegisters();
             Instruction ix = program.instructions.get(eip);
-            if (eip != preveip + 1) {
-                Util.println("");
+            if (ix.name != Inx.NONE) {
+                if (eip != preveip + 1) {
+                    Util.println("");
+                }
+                String seip = Util.rightJustify("" + eip, 4);
+                Util.print(Util.leftJustify(seip + ":" + status(), 36));
+                Util.print(Util.leftJustify(ix.toString(), 60));
             }
-            String seip = Util.rightJustify("" + eip, 4);
-            Util.print(Util.leftJustify(seip + ":" + status(), 36));
-            Util.print(Util.leftJustify(ix.toString(), 60));
-
             preveip = eip;
             eip++;
             switch (ix.name) {
@@ -253,7 +252,7 @@ public class Vx86 {
                     stack = readRegister(Reg.ESP);
                     if (stack == memory.length * 4) {
                         Util.println("");
-                        Util.println(Util.ANSI_GREEN+"VM: Program run finished"+Util.ANSI_RESET);
+                        Util.println(Util.ANSI_GREEN + "VM: Program run finished" + Util.ANSI_RESET);
                         return;
                     }
                     eip = pop();
@@ -383,6 +382,9 @@ public class Vx86 {
                         data = readSrc(ix.opDest, ix.dest, ix.value);
                         eip += data;
                     }
+                    break;
+
+                case NONE:
                     break;
 
                 default:

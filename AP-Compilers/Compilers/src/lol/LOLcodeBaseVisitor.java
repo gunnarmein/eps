@@ -187,6 +187,13 @@ public class LOLcodeBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitVar_rvalue(LOLcodeParser.Var_rvalueContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitVar_assignment(LOLcodeParser.Var_assignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -271,14 +278,21 @@ public class LOLcodeBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitVerb(LOLcodeParser.VerbContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLoop_action(LOLcodeParser.Loop_actionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLoop_action(LOLcodeParser.Loop_actionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLoop_condition(LOLcodeParser.Loop_conditionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitLoop_end(LOLcodeParser.Loop_endContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

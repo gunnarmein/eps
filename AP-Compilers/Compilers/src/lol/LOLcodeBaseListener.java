@@ -306,6 +306,18 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVar_rvalue(LOLcodeParser.Var_rvalueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVar_rvalue(LOLcodeParser.Var_rvalueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVar_assignment(LOLcodeParser.Var_assignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -450,18 +462,6 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVerb(LOLcodeParser.VerbContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVerb(LOLcodeParser.VerbContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterLoop_action(LOLcodeParser.Loop_actionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -469,6 +469,30 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLoop_action(LOLcodeParser.Loop_actionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLoop_condition(LOLcodeParser.Loop_conditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLoop_condition(LOLcodeParser.Loop_conditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLoop_end(LOLcodeParser.Loop_endContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLoop_end(LOLcodeParser.Loop_endContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

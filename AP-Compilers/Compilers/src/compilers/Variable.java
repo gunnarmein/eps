@@ -24,8 +24,13 @@ public class Variable {
     public static enum Type {
         INTEGER, FLOAT, BOOLEAN, STRING, NULL;
     }
+    
+    public int getOffset() {
+        return ordinal*4;
+    }
 
     public static Variable.Type typeFromTypeName(String typeName) {
+        // todo: there is a better way to do this, with token numbers out of the grammar
         Variable.Type t;
         typeName = typeName.toLowerCase();
         switch (typeName) {

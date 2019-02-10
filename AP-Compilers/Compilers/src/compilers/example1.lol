@@ -13,6 +13,15 @@ hai
 
     i duz speak
 
+   how duz i factorial_better yr numbr n
+        i has a numbr result itz 1
+        i'm in yr loop nerfin yr n til both saem n an 1     btw better: "smallr n than 2" or "both saem n an smallr of n an 2"
+            result r produkt of result an n
+        i'm outta yr loop
+        found yr result
+    if u say so
+
+
 
     obtw this is a multi-line comment
 
@@ -48,13 +57,7 @@ hai
         oic
     if u say so
 
-    how duz i factorial_better yr numbr n
-        i has a numbr result itz 1
-        i'm in yr loop nerfin yr n til both saem n an 1     btw better: "smallr n than 2" or "both saem n an smallr of n an 2"
-            result r produkt of result an n
-        i'm outta yr loop
-        found yr result
-    if u say so
+ 
 
 
 

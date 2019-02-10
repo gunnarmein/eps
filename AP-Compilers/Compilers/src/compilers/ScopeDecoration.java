@@ -17,11 +17,13 @@ public class ScopeDecoration extends Decoration {
 
     HashMap<String, Variable> vars;
     HashMap<String, FunctionDecoration> funcs;
+    int varNum;
 
     ScopeDecoration(ParseTree ctx) {
         super(ctx);
         vars = new HashMap<>();
         funcs = new HashMap<>();
+        varNum = 0;
     }
 
     public int getNumVariables() {
@@ -34,16 +36,8 @@ public class ScopeDecoration extends Decoration {
             throw new IllegalArgumentException();
         }
 
-        Variable var = new Variable(name, this.vars.size(), type);
-        vars.put(name, var);
-    }
-
-    public void addParameter(String name, Variable.Type type, int ordinal) {
-        if (!name.equalsIgnoreCase("it") && vars.containsKey(name)) {
-            throw new IllegalArgumentException();
-        }
-
-        Variable var = new Variable(name, ordinal, type);
+        varNum++;
+        Variable var = new Variable(name, -varNum, type);
         vars.put(name, var);
     }
 

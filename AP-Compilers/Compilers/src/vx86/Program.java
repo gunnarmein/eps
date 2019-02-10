@@ -19,6 +19,8 @@ public class Program {
     RuntimeSupport runtime;
     HashMap<String, Label> labels;
     HashMap<Integer, Label> labelLines;
+    int tempLabels;
+    int maxTempLabel;
 
     public Program(ArrayList<Instruction> list, RuntimeSupport runtime) {
         this.instructions = list;
@@ -26,7 +28,8 @@ public class Program {
         this.runtime = runtime;
         this.labels = new HashMap<>();
         this.labelLines = new HashMap<>();
-
+        this.tempLabels = 0;
+        this.maxTempLabel = 0;
     }
 
     public int newStringId(String s) {
@@ -59,6 +62,22 @@ public class Program {
         return 0;
     }
 
+    public int refTempLabel(int i) {
+        maxTempLabel = Math.max(maxTempLabel, i);
+        String l = "$temp" + (tempLabels + i);
+        return refLabel(l);
+    }
+
+    public void defTempLabel(int i) {
+        maxTempLabel = Math.max(maxTempLabel, i);
+        String l = "$temp" + (tempLabels + i);
+        defLabel(l);
+    }
+
+    public void resetTempLabels() {
+        tempLabels += maxTempLabel;
+    }
+
     public boolean hasLabel(String name) {
         Label l = labels.get(name);
         if (l == null) {
@@ -66,13 +85,13 @@ public class Program {
         }
         return l.defined;
     }
-    
+
     public void resolveLabels() {
         for (Label l : labels.values()) {
 
             for (Integer refLine : l.refs) {
                 if (l.defined) {
-                Instruction ix = instructions.get(refLine);
+                    Instruction ix = instructions.get(refLine);
                     ix.value = l.line - (refLine + 1);
                 } else {
                     System.err.println("Reference to undefined label " + l.name + " at " + refLine);
@@ -81,7 +100,7 @@ public class Program {
             }
         }
     }
-    
+
     public void add(Instruction ix) {
         this.instructions.add(ix);
     }
@@ -91,7 +110,12 @@ public class Program {
         for (Instruction x : instructions) {
             Label l = labelLines.get(line);
             if (l != null) {
-                Util.println(l.name+":");
+                Util.println(l.name + ":");
+            }
+            if (x.name == Vx86.Inx.NONE) {
+                Util.println("; " + Util.ANSI_BLUE+x.comment+Util.ANSI_RESET);
+                line++;
+                continue;
             }
             Util.println(Util.rightJustify("" + line, 4) + ": " + x);
             line++;

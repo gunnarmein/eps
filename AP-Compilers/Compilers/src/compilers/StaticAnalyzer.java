@@ -20,16 +20,30 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     // list of functions declared
     ParseTreeProperty<Decoration> decs = new ParseTreeProperty<>();
 
-    // loop checking: the easy stuff
+    int errors = 0;
+
+    void error(String msg, ParserRuleContext ctx) {
+        errors++;
+        Util.println(Util.ANSI_RED
+                + "SA Error: "
+                + ctx.getStart().getLine() + ":" + ctx.getStart().getCharPositionInLine()
+                + ": " + msg
+                + ", " + ctx.getClass().getName()
+                + Util.ANSI_RESET);
+    }
+
     @Override
     public void enterLoop(LOLcodeParser.LoopContext ctx) {
-        List<TerminalNode> labels = ctx.getTokens(LOLcodeParser.IDENTIFIER);
-        if (labels.size() != 2 || !labels.get(0).getText().equals(labels.get(1).getText())) {
-            System.err.println("Encountered mismatched loop labels in line " + ctx.getStart().getLine());
-            throw new IllegalArgumentException();
+        // put up new loop decoration
+        String name = ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
+        LoopDecoration dec = new LoopDecoration(ctx, name);
+        decs.put(ctx, dec);
+
+        // loop checking: the easy stuff
+        if (!name.equals(ctx.getToken(LOLcodeParser.IDENTIFIER, 1).getText())) {
+            error("Encountered mismatched loop labels", ctx);
+            return;
         }
-        System.out.println("Encountering loop " + labels.get(0).getText());
-        // to do: check enter and exit labels
     }
 
     @Override
@@ -59,7 +73,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     @Override
     public void enterReturn_type(LOLcodeParser.Return_typeContext ctx) {
         FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
-        String type = ((TerminalNode)ctx.getChild(1).getChild(0)).getText();
+        String type = ((TerminalNode) ctx.getChild(1).getChild(0)).getText();
         dec.returnType = Variable.typeFromTypeName(type);
     }
 
@@ -87,25 +101,29 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
     @Override
     public void exitVar_decl(LOLcodeParser.Var_declContext ctx) {
-        Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
+        String name = ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
+        Variable v = ScopeDecoration.findVar(decs, ctx, name);
 
         // does it have an initializer?
         if (ctx.getChildCount() == 7) {
             LOLcodeParser.ExprContext expr = (LOLcodeParser.ExprContext) ctx.children.get(6);
             ExprDecoration decInit = (ExprDecoration) decs.get(expr);
             if (v.type != decInit.type) {
-                Util.println("type mismatch in variable initialization at " + expr.getStart().getLine());
-                throw new IllegalArgumentException();
+                error("type mismatch in variable initialization", ctx);
+                return;
             }
         }
     }
 
     @Override
     public void enterArg_decl(LOLcodeParser.Arg_declContext ctx) {
-        // to do: Register this arg in the function's scope
-        // put up new scope
+        // find declaring scope
         FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
-        dec.numArgs++;  // will be counted by arg nodes, updated by exit event
+
+        // register argument as variable
+        String name = ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
+        String type = ctx.getChild(1).getChild(0).getText();
+        dec.addParameter(name, Variable.typeFromTypeName(type));
     }
 
     @Override
@@ -186,8 +204,8 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
                 dec.value = tn.getText().equalsIgnoreCase("win");
                 break;
             default:
-                // not sure how we are here
-                throw new IllegalArgumentException();
+                error("unknown type for literal value, should not be possible", ctx);
+                return;
         }
     }
 
@@ -206,8 +224,8 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
         // has to be numeric
         if (dec.type != Variable.Type.FLOAT && dec.type != Variable.Type.INTEGER) {
-            Util.println("Illegal type for diff at " + ctx.getStart().getLine());
-            throw new IllegalArgumentException();
+            error("Illegal type for diff", ctx);
+            return;
         }
     }
 
@@ -226,8 +244,8 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
         // has to be numeric
         if (dec.type != Variable.Type.FLOAT && dec.type != Variable.Type.INTEGER) {
-            Util.println("Illegal type for diff at " + ctx.getStart().getLine());
-            throw new IllegalArgumentException();
+            error("Illegal type for diff", ctx);
+            return;
         }
     }
 
@@ -244,19 +262,10 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
         setTypeFromChildren(ctx);
     }
-    
-    
+
     @Override
     public void exitFunc_call(LOLcodeParser.Func_callContext ctx) {
     }
-     
-    
-    
-    
-    
-    
-    
-    
 
     private void setTypeFromChildren(ParserRuleContext ctx) {
         // put up the type, and any constant it might have
@@ -276,16 +285,105 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
             } else {
                 // our type is already set, is it the same?
                 if (dec.type != decChild.type) {
-                    Util.println("type mismatch in " + ctx.getStart().getLine());
+                    error("Type mismatch", ctx);
+                    return;
                 }
             }
         }
-        if (dec.type != Variable.Type.NULL) {
-            //Util.println("  success, set to " + dec.type);
-        } else {
-            //Util.println("  failed");
-            throw new IllegalArgumentException();
+        if (dec.type == Variable.Type.NULL) {
+            error("Not able to establish type", ctx);
+            return;
         }
+    }
+
+    @Override
+    public void enterSame(LOLcodeParser.SameContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+    }
+
+    @Override
+    public void exitSame(LOLcodeParser.SameContext ctx) {
+        // get decoration, promote types
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+
+        // check that both args have same type
+        ExprDecoration decArg1 = (ExprDecoration) decs.get(ctx.getChild(2));
+        ExprDecoration decArg2 = (ExprDecoration) decs.get(ctx.getChild(4));
+
+        if (decArg1.type != decArg2.type) {
+            error("Illegal type for comparison", ctx);
+            return;
+        }
+
+        dec.type = Variable.Type.BOOLEAN;
+    }
+
+    @Override
+    public void exitVar_assignment(LOLcodeParser.Var_assignmentContext ctx) {
+        String name = ctx.getChild(0).getChild(0).getText();
+        Variable v = ScopeDecoration.findVar(decs, ctx, name);
+        if (v == null) {
+            error("Unknown variable for assignment", ctx);
+            return;
+        }
+        ExprDecoration decExpr = (ExprDecoration) decs.get(ctx.getChild(2));
+        if (v.type != decExpr.type) {
+            error("Type mismatch for assignment", ctx);
+            return;
+        }
+    }
+
+    @Override
+    public void enterLoop_action(LOLcodeParser.Loop_actionContext ctx) {
+        LoopDecoration dec = LoopDecoration.find(decs, ctx);
+
+        String varName = ctx.getChild(2).getChild(0).getText();
+        Variable v = ScopeDecoration.findVar(decs, ctx, varName);
+        if (v == null) {
+            error("Unknown variable \"" + varName + "\" for loop \"" + dec.name + "\"", ctx);
+            return;
+        }
+        if (v.type != Variable.Type.INTEGER) {
+            error("Variable \"" + varName + "\" for loop \"" + dec.name + "\" is not numbr", ctx);
+            return;
+        }
+
+        dec.v = v;
+        dec.nerfin = (ctx.getToken(LOLcodeParser.NERFIN, 0) != null);
+    }
+
+    @Override
+    public void exitLoop_action(LOLcodeParser.Loop_actionContext ctx) {
+    }
+
+    @Override
+    public void enterLoop_condition(LOLcodeParser.Loop_conditionContext ctx) {
+
+    }
+
+    @Override
+    public void exitLoop_condition(LOLcodeParser.Loop_conditionContext ctx) {
+        LoopDecoration dec = LoopDecoration.find(decs, ctx);
+
+        // check that condition is boolean
+        LOLcodeParser.ExprContext ctxExpr = (LOLcodeParser.ExprContext) ctx.getChild(1);
+        ExprDecoration decExpr = (ExprDecoration) decs.get(ctxExpr);
+        if (decExpr.type != Variable.Type.BOOLEAN) {
+            error ("Non-boolean expression for loop condition in loop \""+dec.name+"\"", ctx);
+            return;
+        }
+        
+        dec.ctxCondition = ctx;
+    }
+
+    @Override
+    public void enterLoop_end(LOLcodeParser.Loop_endContext ctx) {
+    }
+
+    @Override
+    public void exitLoop_end(LOLcodeParser.Loop_endContext ctx) {
     }
 
 }
