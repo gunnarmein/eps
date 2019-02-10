@@ -371,10 +371,11 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         LOLcodeParser.ExprContext ctxExpr = (LOLcodeParser.ExprContext) ctx.getChild(1);
         ExprDecoration decExpr = (ExprDecoration) decs.get(ctxExpr);
         if (decExpr.type != Variable.Type.BOOLEAN) {
-            error ("Non-boolean expression for loop condition in loop \""+dec.name+"\"", ctx);
+            error("Non-boolean expression for loop condition in loop \"" + dec.name + "\"", ctx);
             return;
         }
-        
+
+        dec.until= (ctx.getToken(LOLcodeParser.TIL, 0) != null);
         dec.ctxCondition = ctx;
     }
 
@@ -384,6 +385,20 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
     @Override
     public void exitLoop_end(LOLcodeParser.Loop_endContext ctx) {
+    }
+
+    @Override
+    public void exitReturn_statement(LOLcodeParser.Return_statementContext ctx) {
+        // find continaing scope
+        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+
+        LOLcodeParser.ExprContext ctxExpr = (LOLcodeParser.ExprContext) ctx.getChild(2);
+        ExprDecoration decExpr = (ExprDecoration) decs.get(ctxExpr);
+        if (decExpr.type != dec.returnType) {
+            error("Type mismatch for return value", ctx);
+            return;
+        }
+
     }
 
 }

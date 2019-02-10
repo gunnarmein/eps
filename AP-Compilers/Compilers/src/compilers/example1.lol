@@ -13,15 +13,18 @@ hai
 
     i duz speak
 
-   how duz i factorial_better yr numbr n
+   how duz i factorial_better yr numbr n into numbr
         i has a numbr result itz 1
         i'm in yr loop nerfin yr n til both saem n an 1     btw better: "smallr n than 2" or "both saem n an smallr of n an 2"
             result r produkt of result an n
         i'm outta yr loop
+        visible "result : ",result mkay
         found yr result
     if u say so
 
-
+    visible "before"
+    I duz factorial_better yr 10
+    visible "after"
 
     obtw this is a multi-line comment
 

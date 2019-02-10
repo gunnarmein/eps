@@ -20,15 +20,15 @@ import vx86.Vx86;
  * @author gmein
  */
 public class CodeGenerator extends LOLcodeBaseListener {
-    
+
     Program p;
     ParseTreeProperty<Decoration> decs;
-    
+
     public CodeGenerator(ParseTreeProperty<Decoration> decs) {
         this.p = new Program(new ArrayList<>(), new LOLDefaultRuntime());
         this.decs = decs;
     }
-    
+
     @Override
     public void enterProgram(LOLcodeParser.ProgramContext ctx) {
         ScopeDecoration dec = ScopeDecoration.find(decs, ctx);
@@ -45,9 +45,9 @@ public class CodeGenerator extends LOLcodeBaseListener {
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, p.newStringId("LOLCode main program started"), "string id of start message"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push argument"));
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("output"), "call $output"));
-        
+
     }
-    
+
     @Override
     public void exitProgram(LOLcodeParser.ProgramContext ctx) {
         // print start message
@@ -60,7 +60,7 @@ public class CodeGenerator extends LOLcodeBaseListener {
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "kill frame"));
         p.add(new Instruction(Vx86.Inx.RET, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "return to host"));
     }
-    
+
     @Override
     public void enterFunc_decl(LOLcodeParser.Func_declContext ctx) {
         FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
@@ -77,20 +77,20 @@ public class CodeGenerator extends LOLcodeBaseListener {
         // now room for local variables
         p.add(new Instruction(Vx86.Inx.SUB, Vx86.Mode.REGISTER, Vx86.Reg.ESP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, dec.getNumVariables() * 4, "room for locals"));
     }
-    
+
     @Override
     public void exitFunc_decl(LOLcodeParser.Func_declContext ctx) {
         FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
         String name = ctx.getTokens(LOLcodeParser.IDENTIFIER).get(0).getText();
-        
+
         p.defLabel(name + "$ret");
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.ESP, Vx86.Mode.REGISTER, Vx86.Reg.EBP, 0, "scratch locals"));
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "restore previous frame pointer"));
         p.add(new Instruction(Vx86.Inx.RET, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, dec.numArgs * 4, "return from function"));
         p.defLabel(name + "$after");
-        
+
     }
-    
+
     @Override
     public void exitOutput_arg(LOLcodeParser.Output_argContext ctx) {
         // if this, an arg to the visible function, is not a string, convert it into one
@@ -114,18 +114,18 @@ public class CodeGenerator extends LOLcodeBaseListener {
             }
         }
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push arg for output"));
-        
+
     }
-    
+
     @Override
     public void exitNaked_arg(LOLcodeParser.Naked_argContext ctx) {
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push arg"));
     }
-    
+
     @Override
     public void enterOutput_args(LOLcodeParser.Output_argsContext ctx) {
     }
-    
+
     @Override
     public void exitOutput_args(LOLcodeParser.Output_argsContext ctx) {
         OutputArgListDecoration dec = (OutputArgListDecoration) decs.get(ctx);
@@ -137,17 +137,17 @@ public class CodeGenerator extends LOLcodeBaseListener {
             p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push string for output"));
         }
     }
-    
+
     @Override
     public void exitOutput(LOLcodeParser.OutputContext ctx) {
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("output"), "call $output"));
     }
-    
+
     @Override
     public void enterLiteral_value(LOLcodeParser.Literal_valueContext ctx) {
         // put up the type, and any constant it might have
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
-        
+
         switch (dec.type) {
             case INTEGER:
                 p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, (int) dec.value, "int constant " + dec.value));
@@ -166,21 +166,21 @@ public class CodeGenerator extends LOLcodeBaseListener {
                 throw new IllegalArgumentException();
         }
     }
-    
+
     @Override
     public void exitDiff(LOLcodeParser.DiffContext ctx) {
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 1"));
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 2"));
         p.add(new Instruction(Vx86.Inx.SUB, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
     }
-    
+
     @Override
     public void exitProduct(LOLcodeParser.ProductContext ctx) {
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 1"));
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 2"));
         p.add(new Instruction(Vx86.Inx.MUL, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
     }
-    
+
     @Override
     public void exitVar_decl(LOLcodeParser.Var_declContext ctx) {
         Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
@@ -191,13 +191,13 @@ public class CodeGenerator extends LOLcodeBaseListener {
         }
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "initial value for \"" + v.name + "\""));
     }
-    
+
     @Override
     public void enterVar_ref(LOLcodeParser.Var_refContext ctx) {
         Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, v.getOffset(), "load \"" + v.name + "\""));
     }
-    
+
     @Override
     public void exitInput(LOLcodeParser.InputContext ctx) {
         Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
@@ -209,31 +209,31 @@ public class CodeGenerator extends LOLcodeBaseListener {
             Util.println("Type mismatch for GIMMEH: " + v.name);
             throw new IllegalArgumentException();
         }
-        
+
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("input"), "call $input"));
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "store \"" + v.name + "\""));
-        
+
     }
-    
+
     @Override
     public void exitVar_assignment(LOLcodeParser.Var_assignmentContext ctx) {
         String name = ctx.getChild(0).getChild(0).getText();
         Variable v = ScopeDecoration.findVar(decs, ctx, name);
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "store \"" + v.name + "\""));
     }
-    
+
     @Override
     public void exitFunc_call(LOLcodeParser.Func_callContext ctx) {
         String name = ctx.getChild(2).getText();
         FunctionDecoration dec = FunctionDecoration.findByName(decs, ctx, name);
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel(dec.name), "call \"" + dec.name + "\""));
     }
-    
+
     @Override
     public void exitSame(LOLcodeParser.SameContext ctx) {
         // get type of operands
         ExprDecoration decArg1 = (ExprDecoration) decs.get(ctx.getChild(2));
-        
+
         switch (decArg1.type) {
             case INTEGER:
                 p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "same arg 1"));
@@ -246,26 +246,26 @@ public class CodeGenerator extends LOLcodeBaseListener {
         }
         p.resetTempLabels();
     }
-    
+
     @Override
     public void enterInner_statement(LOLcodeParser.Inner_statementContext ctx) {
         p.add(new Instruction(Vx86.Inx.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0,
                 "statement: " + ctx.getText().replace("\n", " ")));
     }
-    
+
     @Override
     public void enterTop_level_statement(LOLcodeParser.Top_level_statementContext ctx) {
         p.add(new Instruction(Vx86.Inx.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0,
                 "statement: " + ctx.getText().replace("\n", " ")));
     }
-    
+
     @Override
     public void enterLoop_condition(LOLcodeParser.Loop_conditionContext ctx) {
         LoopDecoration dec = LoopDecoration.find(decs, ctx);
         // just provide a label to jump back to from end of loop
         p.defLabel("$loopstart$" + dec.name);
     }
-    
+
     @Override
     public void exitLoop_condition(LOLcodeParser.Loop_conditionContext ctx) {
         LoopDecoration dec = LoopDecoration.find(decs, ctx);
@@ -273,25 +273,35 @@ public class CodeGenerator extends LOLcodeBaseListener {
             // expr has already been generated
             // now just check for true/false and skip out of loop if false
             p.add(new Instruction(Vx86.Inx.CMP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, 0, "done?"));
-            p.add(new Instruction(Vx86.Inx.JE, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel("$loopend$" + dec.name), "done, leave loop"));
+            if (dec.until) {
+                p.add(new Instruction(Vx86.Inx.JNE, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel("$loopend$" + dec.name), "done, leave loop"));
+            } else {
+                p.add(new Instruction(Vx86.Inx.JE, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel("$loopend$" + dec.name), "done, leave loop"));
+            }
         }
     }
-    
+
     @Override
     public void exitLoop_end(LOLcodeParser.Loop_endContext ctx) {
         LoopDecoration dec = LoopDecoration.find(decs, ctx);
         // if there is an action on a variable, do it now
         if (dec.v != null) {
             if (dec.nerfin) {
-                p.add(new Instruction(Vx86.Inx.DEC, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, dec.v.getOffset(), "nerfin yr "+dec.v.name));
+                p.add(new Instruction(Vx86.Inx.DEC, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, dec.v.getOffset(), "nerfin yr " + dec.v.name));
             } else {
-                p.add(new Instruction(Vx86.Inx.INC, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, dec.v.getOffset(), "uppin yr "+dec.v.name));
+                p.add(new Instruction(Vx86.Inx.INC, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, dec.v.getOffset(), "uppin yr " + dec.v.name));
             }
         }
-        
+
         // jump to start, and provide end label
         p.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel("$loopstart$" + dec.name), "jump to loop start"));
-        p.defLabel("$loopend$"+dec.name);
+        p.defLabel("$loopend$" + dec.name);
+    }
+
+    @Override
+    public void exitReturn_statement(LOLcodeParser.Return_statementContext ctx) {
+        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        p.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel(dec.name + "$ret"), "jump to common return point"));
     }
 
     // blank instruction to copy

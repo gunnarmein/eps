@@ -20,6 +20,7 @@ public class LoopDecoration extends Decoration {
     LOLcodeParser.Loop_conditionContext ctxCondition;
     Variable v;
     boolean nerfin;
+    boolean until;
 
     LoopDecoration(ParserRuleContext ctx, String name) {
         super(ctx);
