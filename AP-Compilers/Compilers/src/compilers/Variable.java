@@ -22,7 +22,7 @@ public class Variable {
             
     
     public static enum Type {
-        NUMBR, NUMBAR, TROOF, YARN, NOOB;
+        INTEGER, FLOAT, BOOLEAN, STRING, NULL;
     }
     
 }

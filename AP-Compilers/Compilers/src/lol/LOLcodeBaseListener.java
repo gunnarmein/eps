@@ -582,6 +582,18 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterOutput_arg(LOLcodeParser.Output_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOutput_arg(LOLcodeParser.Output_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterOutput_args(LOLcodeParser.Output_argsContext ctx) { }
 	/**
 	 * {@inheritDoc}

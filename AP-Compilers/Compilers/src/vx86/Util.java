@@ -34,6 +34,7 @@ public class Util {
 
     public static void debugOn() {
         debug = true;
+        System.setErr(System.out);
     }
 
     public static void debugOff() {

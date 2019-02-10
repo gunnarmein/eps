@@ -348,6 +348,13 @@ public class LOLcodeBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitOutput_arg(LOLcodeParser.Output_argContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitOutput_args(LOLcodeParser.Output_argsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

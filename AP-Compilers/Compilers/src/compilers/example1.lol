@@ -1,7 +1,7 @@
 hai
-    visible "hai there worldz!"
+    visible "this is ", 3, " and ", 3.1415 MKAY
     obtw this is a multi-line comment
-    tldr
+
 
     how duz i judge yr yarn animal
         BOTH SAEM ANIMAL AN "CAT", O RLY?                                       btw expr, if
@@ -58,4 +58,6 @@ hai
     i duz factorial yr k
     visible smoosh "found yr faktorial of " an k an ", itz " an it mkay
     visible smoosh "found yr faktorial_better of " an k an ", itz " an it mkay
+
+    tldr
 kthxbye

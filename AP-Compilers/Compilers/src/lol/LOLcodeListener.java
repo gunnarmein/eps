@@ -480,6 +480,16 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 */
 	void exitInput(LOLcodeParser.InputContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#output_arg}.
+	 * @param ctx the parse tree
+	 */
+	void enterOutput_arg(LOLcodeParser.Output_argContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#output_arg}.
+	 * @param ctx the parse tree
+	 */
+	void exitOutput_arg(LOLcodeParser.Output_argContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#output_args}.
 	 * @param ctx the parse tree
 	 */

@@ -21,13 +21,16 @@ fragment ID_CHAR: [a-zA-Z0-9_];
 
 fragment NATURAL_NUMBER: DIGIT_NO_ZERO DIGIT*;
 fragment NATURAL_NUMBER_OR_ZERO: '0' | NATURAL_NUMBER;
-NUMBER: MINUS? NATURAL_NUMBER_OR_ZERO (DOT NATURAL_NUMBER_OR_ZERO)?;
+INTEGER: MINUS? NATURAL_NUMBER_OR_ZERO;
+FLOAT: MINUS? NATURAL_NUMBER_OR_ZERO DOT NATURAL_NUMBER_OR_ZERO?;
 
 fragment QUOTE: '"';
-YARN_LITERAL: QUOTE .*? QUOTE;
+STRING: QUOTE .*? QUOTE;
 
 WIN: 'win' | 'WIN';
 FAIL: 'fail' | 'FAIL';
+BOOLEAN: WIN|FAIL;
+
 NUMBR: 'numbr'|'NUMBR';
 NUMBAR: 'numbar'|'NUMBAR';
 YARN: 'yarn' |'YARN';
@@ -106,7 +109,7 @@ WS   : [ \r\t] -> skip;
 
 
 
-literal_value: NUMBER|YARN_LITERAL|WIN|FAIL;
+literal_value: INTEGER|FLOAT|STRING|BOOLEAN;
 atom: literal_value | IT | IDENTIFIER;
 vartype: NUMBR | NUMBAR | YARN | TROOF |NOOB;
 
@@ -198,10 +201,11 @@ elseif: MEBBE expr separator+ block;
 anelse: NO WAI separator+ block;
 ifthenelseifelse: anif separator+ then (separator+ elseif)* (separator+ anelse)? separator+  OIC;
 
-// input / output
+// input / output. have arguments explcitily called out so we can convert to string in code generation phase
 
 input: GIMMEH IDENTIFIER;
-output_args: expr? ((COMMA expr)* MKAY)?;
+output_arg: expr;
+output_args: output_arg? ((COMMA output_arg)* MKAY)?;
 output: VISIBLE output_args EXCLAMATION?;
 
 

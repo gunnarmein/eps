@@ -35,20 +35,20 @@ public class ScopeDecoration extends Decoration {
 
         switch (type) {
             case "numbr":
-                t = Variable.Type.NUMBR;
+                t = Variable.Type.INTEGER;
                 break;
             case "numbar":
-                t = Variable.Type.NUMBAR;
+                t = Variable.Type.FLOAT;
                 break;
             case "yarn":
-                t = Variable.Type.YARN;
+                t = Variable.Type.STRING;
                 break;
             case "troof":
-                t = Variable.Type.TROOF;
+                t = Variable.Type.BOOLEAN;
                 break;
 
             default:
-                t = Variable.Type.NOOB;
+                t = Variable.Type.NULL;
         }
 
         Variable var = new Variable(name, this.vars.size(), t);

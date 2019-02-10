@@ -19,10 +19,12 @@ public class Compilers {
 
     public static void main(String[] args) throws IOException {
         Util.debugOn();
+        
         Vx86 vm = new Vx86();
 
+        /*
         //
-        // first, assemble and run a small increment program
+        // first, assemble and run a small "increment" program
         //
         Program program1 = Examples.example_increment();
         program1.resolveLabels();
@@ -36,7 +38,7 @@ public class Compilers {
 
         
         //
-        // now, run the more complicated recursive factorial program
+        // now, assemble and run the more complicated recursive "factorial" program
         //
         Program program2 = Examples.example_factorial();
         program2.resolveLabels();
@@ -45,7 +47,7 @@ public class Compilers {
         vm.setup(program2);
         vm.run();
 
-        
+        */
         
         //
         // now, compile an actual lolcode example
@@ -56,9 +58,8 @@ public class Compilers {
         }
         
         p.dump();
-//        Vx86 vm = new Vx86();
-//        vm.setup(p);
-//        vm.run();
+        vm.setup(p);
+        vm.run();
     }
 
 }

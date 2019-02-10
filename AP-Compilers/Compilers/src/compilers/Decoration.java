@@ -25,7 +25,7 @@ public class Decoration {
         while (ctx != null) {
             Decoration dec = decs.get(ctx);
             if (dec != null && thisClass.isInstance(dec)) {
-                return (FunctionDecoration) dec;
+                return dec;
             }
             ctx = ctx.getParent();
         }

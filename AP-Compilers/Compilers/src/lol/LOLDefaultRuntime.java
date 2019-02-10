@@ -32,7 +32,9 @@ public class LOLDefaultRuntime implements RuntimeSupport {
         stringToInt(7),
         stringToFloat(8),
         concat(9),
-        strcmp(10);
+        strcmp(10),
+        booleanToString(11),
+        stringToBoolean(12);
 
         private int addr;
 
@@ -60,6 +62,8 @@ public class LOLDefaultRuntime implements RuntimeSupport {
     public void invokeRoutine(Vx86 vm, int addr) {
         int stack = 0;
         int args = 0;
+        int id = 0;
+        String s = null;
 
         addr -= RUNTIME_BASE;
         if (addr < 0 || addr >= routines.length) {
@@ -69,26 +73,55 @@ public class LOLDefaultRuntime implements RuntimeSupport {
 
         switch (routines[addr]) {
             case output:
-                Util.println("");
-                Util.print(Util.ANSI_GREEN + "Vx86 output :");
-                int id = vm.peekStackVar(argument(1));
-                String s = vm.strings.getString(id);
+                //Util.println("");
+                //Util.print(Util.ANSI_GREEN + "Vx86 output :");
+                id = vm.peekStackVar(argument(1));
+                s = vm.strings.getString(id);
                 if (s == null) {
-                    System.err.println("Unknown string id " + id);
+                    Util.println("Unknown string id " + id);
                     throw new IllegalArgumentException();
                 }
+                System.out.println();
                 System.out.println(Util.ANSI_BLUE + s + Util.ANSI_RESET);
                 args = 1;
                 break;
+                
             case intToString:
-                Util.println("");
-                Util.println(Util.ANSI_GREEN + "Vx86: $intToString called" + Util.ANSI_RESET);
-                int sid = vm.strings.newStringId(Integer.toString(vm.peekStackVar(argument(1))));
-                vm.writeRegister(Vx86.Reg.EAX, sid);
+                //Util.println("");
+                //Util.println(Util.ANSI_GREEN + "Vx86: $intToString called" + Util.ANSI_RESET);
+                id = vm.strings.newStringId(Integer.toString(vm.peekStackVar(argument(1))));
+                vm.writeRegister(Vx86.Reg.EAX, id);
                 args = 1;
                 break;
+
+           case floatToString:
+                //Util.println("");
+                //Util.println(Util.ANSI_GREEN + "Vx86: $intToString called" + Util.ANSI_RESET);
+                id = vm.strings.newStringId(Float.toString(Float.intBitsToFloat(vm.peekStackVar(argument(1)))));
+                vm.writeRegister(Vx86.Reg.EAX, id);
+                args = 1;
+                break;
+
+            case concat:
+                //Util.println("");
+                //Util.println(Util.ANSI_GREEN + "Vx86: $concat called" + Util.ANSI_RESET);
+                args = vm.peekStackVar(argument(1));
+                s = "";
+                for (int i = args+1; i > 1; i--) {
+                    id = vm.peekStackVar(argument(i));
+                    if (s == null) {
+                        Util.println("Unknown string id " + id);
+                        throw new IllegalArgumentException();
+                    }
+                    s += vm.strings.getString(id);
+                }
+                id = vm.strings.newStringId(s);
+                vm.writeRegister(Vx86.Reg.EAX, id);
+                args++; // had number of strings, too
+                break;
             default:
-                System.err.println("invalid runtime call " + addr + "[" + routines[addr] + "] at " + (vm.eip - 1));
+                Util.println("");
+                Util.println("invalid runtime call " + addr + "[" + routines[addr] + "] at " + (vm.eip - 1));
                 throw new IllegalArgumentException();
         }
 
