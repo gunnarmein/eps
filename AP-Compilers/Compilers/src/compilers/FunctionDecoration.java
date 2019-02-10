@@ -12,25 +12,29 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  *
  * @author gmein
  */
-public class FunctionDecoration extends ScopeDecoration{
+public class FunctionDecoration extends ScopeDecoration {
+
     public int numArgs;
     public String name;
     public Variable.Type returnType;
-    
+
     FunctionDecoration(ParseTree ctx, String name) {
         super(ctx);
         this.name = name;
         this.numArgs = 0;
         this.returnType = Variable.Type.NULL;
     }
-    
-    
+
     static FunctionDecoration find(ParseTreeProperty<Decoration> decs, ParseTree ctx) {
-      Decoration dec =  Decoration.find(decs, ctx, FunctionDecoration.class);
-      if (dec != null) {
-          return (FunctionDecoration) dec;
-      }
-      return null;
+        Decoration dec = Decoration.find(decs, ctx, FunctionDecoration.class);
+        if (dec != null) {
+            return (FunctionDecoration) dec;
+        }
+        return null;
+    }
+
+    static FunctionDecoration findByName(ParseTreeProperty<Decoration> decs, ParseTree ctx, String name) {
+        return ScopeDecoration.findFunc(decs, ctx, name);
     }
 
 }

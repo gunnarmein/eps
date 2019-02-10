@@ -177,7 +177,7 @@ naked_arg: expr;
 arg: YR naked_arg;
 more_args: (AN arg)* MKAY;
 args: arg more_args?;
-func_call: I (DUZ|IZ) IDENTIFIER args;
+func_call: I (DUZ|IZ) IDENTIFIER args?;
 
 // loops
 

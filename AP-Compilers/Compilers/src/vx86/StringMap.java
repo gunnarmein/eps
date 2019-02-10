@@ -13,7 +13,12 @@ import java.util.HashMap;
  */
 public class StringMap {
 
-        HashMap<Integer, String> map = new HashMap<>();
+        HashMap<Integer, String> map;
+        
+        StringMap() {
+            map = new HashMap<>();
+            map.put(0, "<NULL>"); // reserve 0 id
+        }
 
         public int newStringId(String s) {
             int id = map.size() + 1;

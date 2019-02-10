@@ -232,4 +232,11 @@ public class CodeGenerator extends LOLcodeBaseListener {
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, -(v.ordinal + 1) * 4, "store \"" + v.name + "\""));
     }
 
+    @Override
+    public void exitFunc_call(LOLcodeParser.Func_callContext ctx) {
+        String name = ctx.getChild(2).getText();
+        FunctionDecoration dec = FunctionDecoration.findByName(decs, ctx, name);
+        p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel(dec.name), "call \"" + dec.name + "\""));
+    }
+
 }

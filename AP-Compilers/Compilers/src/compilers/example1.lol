@@ -2,13 +2,16 @@ hai
     i has a numbr variable itz 5
     visible variable
     i has a yarn text
-    //gimmeh text
+    btw gimmeh text
     visible text
     text r "blue"
     visible text
 
     how duz i speak into numbr
+        visible "speaking"
     if u say so
+
+    i duz speak
 
 
     obtw this is a multi-line comment

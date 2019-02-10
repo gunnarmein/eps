@@ -244,6 +244,19 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
         setTypeFromChildren(ctx);
     }
+    
+    
+    @Override
+    public void exitFunc_call(LOLcodeParser.Func_callContext ctx) {
+    }
+     
+    
+    
+    
+    
+    
+    
+    
 
     private void setTypeFromChildren(ParserRuleContext ctx) {
         // put up the type, and any constant it might have
