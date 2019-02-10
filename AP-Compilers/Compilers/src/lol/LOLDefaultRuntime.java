@@ -5,6 +5,7 @@
  */
 package lol;
 
+import java.util.Scanner;
 import vx86.Util;
 import vx86.Vx86;
 import static vx86.Vx86.RUNTIME_BASE;
@@ -86,6 +87,17 @@ public class LOLDefaultRuntime implements RuntimeSupport {
                 args = 1;
                 break;
                 
+            case input:
+                Util.println("");
+                Util.print(Util.ANSI_GREEN + "Vx86 input:"+Util.ANSI_BLUE);
+                System.out.println();
+                Scanner sc = new Scanner(System.in);
+                s = sc.nextLine();
+                id = vm.strings.newStringId(s);
+                vm.writeRegister(Vx86.Reg.EAX, id);
+                args = 0;
+                break;
+
             case intToString:
                 //Util.println("");
                 //Util.println(Util.ANSI_GREEN + "Vx86: $intToString called" + Util.ANSI_RESET);
@@ -94,7 +106,7 @@ public class LOLDefaultRuntime implements RuntimeSupport {
                 args = 1;
                 break;
 
-           case floatToString:
+            case floatToString:
                 //Util.println("");
                 //Util.println(Util.ANSI_GREEN + "Vx86: $intToString called" + Util.ANSI_RESET);
                 id = vm.strings.newStringId(Float.toString(Float.intBitsToFloat(vm.peekStackVar(argument(1)))));
@@ -107,7 +119,7 @@ public class LOLDefaultRuntime implements RuntimeSupport {
                 //Util.println(Util.ANSI_GREEN + "Vx86: $concat called" + Util.ANSI_RESET);
                 args = vm.peekStackVar(argument(1));
                 s = "";
-                for (int i = args+1; i > 1; i--) {
+                for (int i = args + 1; i > 1; i--) {
                     id = vm.peekStackVar(argument(i));
                     if (s == null) {
                         Util.println("Unknown string id " + id);

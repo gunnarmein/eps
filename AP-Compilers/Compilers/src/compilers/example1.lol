@@ -1,6 +1,9 @@
 hai
     i has a numbr variable itz 5
     visible variable
+    i has a yarn text
+    gimmeh text
+    visible text
 
     obtw this is a multi-line comment
 
