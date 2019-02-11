@@ -216,16 +216,20 @@ output: VISIBLE output_args EXCLAMATION?;
 
 // statments and blocks
 
-core_statement:
-   var_decl |
+statement_affecting_it:
    var_assignment | 
+   var_decl |
+   input |
+   func_call |
+   output |
+   expr 
+;
+
+core_statement:
+   statement_affecting_it |
    loop |
    ifthenelseifelse |
-   aswitch |
-   input |
-   output |
-   func_call |
-   expr 
+   aswitch 
 ;
 
 inner_statement: 

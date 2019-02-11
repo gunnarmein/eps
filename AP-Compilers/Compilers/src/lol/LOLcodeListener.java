@@ -540,6 +540,16 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 */
 	void exitOutput(LOLcodeParser.OutputContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#statement_affecting_it}.
+	 * @param ctx the parse tree
+	 */
+	void enterStatement_affecting_it(LOLcodeParser.Statement_affecting_itContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#statement_affecting_it}.
+	 * @param ctx the parse tree
+	 */
+	void exitStatement_affecting_it(LOLcodeParser.Statement_affecting_itContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#core_statement}.
 	 * @param ctx the parse tree
 	 */

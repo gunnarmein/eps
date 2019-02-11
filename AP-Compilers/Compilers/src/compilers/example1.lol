@@ -18,7 +18,7 @@ hai
         i'm in yr loop nerfin yr n til both saem n an 1     btw better: "smallr n than 2" or "both saem n an smallr of n an 2"
             result r produkt of result an n
         i'm outta yr loop
-        visible "result : ",result mkay
+        btw visible "result : ",result mkay
         found yr result
     if u say so
 

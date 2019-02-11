@@ -375,7 +375,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
             return;
         }
 
-        dec.until= (ctx.getToken(LOLcodeParser.TIL, 0) != null);
+        dec.until = (ctx.getToken(LOLcodeParser.TIL, 0) != null);
         dec.ctxCondition = ctx;
     }
 
@@ -399,6 +399,40 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
             return;
         }
 
+    }
+
+    @Override
+    public void exitStatement_affecting_it(LOLcodeParser.Statement_affecting_itContext ctx) {
+        // after these statements, update the pseudo-variable "it"
+        String name;
+        Variable v;
+
+        Variable it = ScopeDecoration.findVar(decs, ctx, "IT");
+
+        ParserRuleContext ctxChild = (ParserRuleContext) ctx.getChild(0);
+        if (ctxChild instanceof LOLcodeParser.Var_declContext) {
+            name = ctxChild.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
+            v = ScopeDecoration.findVar(decs, ctx, name);
+            it.type = v.type;
+        } else if (ctxChild instanceof LOLcodeParser.Var_assignmentContext) {
+            name = ctxChild.getChild(0).getChild(0).getText();
+            v = ScopeDecoration.findVar(decs, ctx, name);
+            it.type = v.type;
+        } else if (ctxChild instanceof LOLcodeParser.InputContext) {
+            it.type = Variable.Type.STRING;
+        } else if (ctxChild instanceof LOLcodeParser.OutputContext) {
+            it.type = Variable.Type.STRING;
+        } else if (ctxChild instanceof LOLcodeParser.ExprContext) {
+            ExprDecoration decExpr = (ExprDecoration) decs.get(ctxChild);
+            it.type = decExpr.type;
+        } else if (ctxChild instanceof LOLcodeParser.Func_callContext) {
+            name = ctxChild.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
+            FunctionDecoration decFunc = ScopeDecoration.findFunc(decs, ctx, name);
+            it.type = decFunc.returnType;
+        } else {
+            error("Error maintaining \"it\", not sure hwo we got here", ctx);
+            return;
+        }
     }
 
 }

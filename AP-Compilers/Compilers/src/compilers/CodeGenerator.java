@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import lol.LOLDefaultRuntime;
 import lol.LOLcodeBaseListener;
 import lol.LOLcodeParser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import vx86.Instruction;
 import vx86.Program;
@@ -302,6 +304,14 @@ public class CodeGenerator extends LOLcodeBaseListener {
     public void exitReturn_statement(LOLcodeParser.Return_statementContext ctx) {
         FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
         p.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel(dec.name + "$ret"), "jump to common return point"));
+    }
+
+    @Override
+    public void exitStatement_affecting_it(LOLcodeParser.Statement_affecting_itContext ctx) {
+        // after these statements, update the pseudo-variable "it"
+
+        Variable it = ScopeDecoration.findVar(decs, ctx, "IT");
+        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, it.getOffset(), "update variable \"it\""));
     }
 
     // blank instruction to copy
