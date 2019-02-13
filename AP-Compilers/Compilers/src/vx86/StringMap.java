@@ -13,21 +13,21 @@ import java.util.HashMap;
  */
 public class StringMap {
 
-        HashMap<Integer, String> map;
-        
-        StringMap() {
-            map = new HashMap<>();
-            map.put(0, "<NULL>"); // reserve 0 id
-        }
+    HashMap<Integer, String> map;
 
-        public int newStringId(String s) {
-            int id = map.size() + 1;
-            map.put(map.size() + 1, s);
-            return id;
-        }
-
-        public String getString(int id) {
-            return map.get(id);
-        }
-
+    StringMap() {
+        map = new HashMap<>();
+        map.put(0, "<NULL>"); // reserve 0 id
     }
+
+    public int newStringId(String s) {
+        int id = map.size() + 1;
+        map.put(map.size() + 1, s);
+        return id;
+    }
+
+    public String getString(int id) {
+        return map.get(id);
+    }
+
+}

@@ -49,9 +49,10 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     @Override
     public void enterProgram(LOLcodeParser.ProgramContext ctx) {
         // put up new scope
-        ScopeDecoration scope = new ScopeDecoration(ctx);
+        GlobalScopeDecoration scope = new GlobalScopeDecoration(ctx);
         decs.put(ctx, scope);
-        scope.addVariable("IT", Variable.Type.NULL);
+        Variable v = new Variable("IT", Variable.Type.NULL);
+        scope.storeVariable(v);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         FunctionDecoration dec = new FunctionDecoration(ctx, name);
 
         // now find the responsible scope and register the function
-        ScopeDecoration scope = ScopeDecoration.find(decs, ctx);
+        GlobalScopeDecoration scope = GlobalScopeDecoration.find(decs, ctx);
         scope.addFunction(ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText(), dec);
 
         // register the new scope
@@ -72,14 +73,14 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
     @Override
     public void enterReturn_type(LOLcodeParser.Return_typeContext ctx) {
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         String type = ((TerminalNode) ctx.getChild(1).getChild(0)).getText();
         dec.returnType = Variable.typeFromTypeName(type);
     }
 
     @Override
     public void exitFunc_decl(LOLcodeParser.Func_declContext ctx) {
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         //Util.println("Exiting function declaration for " + dec.name + ", counted " + dec.numArgs + " arguments");
     }
 
@@ -94,7 +95,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
         // now find the responsible scope and register the variable
         ScopeDecoration scope = ScopeDecoration.find(decs, ctx);
-        scope.addVariable(ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText(), Variable.typeFromTypeName(type));
+        scope.addVariable(decs, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText(), Variable.typeFromTypeName(type));
 
         //Util.println("registered variable " + name + " with type " + type);
     }
@@ -118,7 +119,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     @Override
     public void enterArg_decl(LOLcodeParser.Arg_declContext ctx) {
         // find declaring scope
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
 
         // register argument as variable
         String name = ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
@@ -390,7 +391,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     @Override
     public void exitReturn_statement(LOLcodeParser.Return_statementContext ctx) {
         // find continaing scope
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
 
         LOLcodeParser.ExprContext ctxExpr = (LOLcodeParser.ExprContext) ctx.getChild(2);
         ExprDecoration decExpr = (ExprDecoration) decs.get(ctxExpr);
@@ -427,7 +428,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
             it.type = decExpr.type;
         } else if (ctxChild instanceof LOLcodeParser.Func_callContext) {
             name = ctxChild.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
-            FunctionDecoration decFunc = ScopeDecoration.findFunc(decs, ctx, name);
+            FunctionDecoration decFunc = GlobalScopeDecoration.findFunc(decs, ctx, name);
             it.type = decFunc.returnType;
         } else {
             error("Error maintaining \"it\", not sure hwo we got here", ctx);

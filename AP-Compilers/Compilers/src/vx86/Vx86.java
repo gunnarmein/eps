@@ -63,6 +63,7 @@ public class Vx86 {
         JL,
         JLE,
         JMP,
+        DATA
     }
 
     //

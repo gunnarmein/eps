@@ -12,9 +12,11 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  *
  * @author gmein
  */
-public class FunctionDecoration extends ScopeDecoration {
+public class FunctionDecoration extends StorageScopeDecoration {
 
     public int numArgs;
+    public int numVars;
+
     public String name;
     public Variable.Type returnType;
 
@@ -22,6 +24,7 @@ public class FunctionDecoration extends ScopeDecoration {
         super(ctx);
         this.name = name;
         this.numArgs = 0;
+        this.numVars = 0;
         this.returnType = Variable.Type.NULL;
     }
 
@@ -31,11 +34,21 @@ public class FunctionDecoration extends ScopeDecoration {
         }
 
         this.numArgs++;
-        Variable var = new Variable(name, numArgs+1, type);
+        Variable var = new Variable(name, type);
+        var.ordinal = numArgs + 1;
+        var.global = false;
         this.vars.put(name, var);
     }
 
-    static FunctionDecoration find(ParseTreeProperty<Decoration> decs, ParseTree ctx) {
+    @Override
+    public void storeVariable(Variable v) {
+        this.numVars++;
+        v.ordinal = -numVars;
+        v.global = false;
+        this.vars.put(v.name, v);
+    }
+
+    static FunctionDecoration findContaining(ParseTreeProperty<Decoration> decs, ParseTree ctx) {
         Decoration dec = Decoration.find(decs, ctx, FunctionDecoration.class);
         if (dec != null) {
             return (FunctionDecoration) dec;
@@ -44,7 +57,7 @@ public class FunctionDecoration extends ScopeDecoration {
     }
 
     static FunctionDecoration findByName(ParseTreeProperty<Decoration> decs, ParseTree ctx, String name) {
-        return ScopeDecoration.findFunc(decs, ctx, name);
+        return GlobalScopeDecoration.findFunc(decs, ctx, name);
     }
 
 }

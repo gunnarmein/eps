@@ -6,11 +6,11 @@
 package compilers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import lol.LOLDefaultRuntime;
 import lol.LOLcodeBaseListener;
 import lol.LOLcodeParser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import vx86.Instruction;
 import vx86.Program;
@@ -33,17 +33,21 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     @Override
     public void enterProgram(LOLcodeParser.ProgramContext ctx) {
-        ScopeDecoration dec = ScopeDecoration.find(decs, ctx);
+        GlobalScopeDecoration dec = GlobalScopeDecoration.find(decs, ctx);
 
-        // code to label the main entry point, and to establish a frame
+        // code to label the main entry point
         p.defLabel("$main");
-        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
-        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.ESP, 0, "establish new frame pointer"));
+        p.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel("$start")));
 
-        // now add room for global variables
-        p.add(new Instruction(Vx86.Inx.SUB, Vx86.Mode.REGISTER, Vx86.Reg.ESP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, dec.getNumVariables() * 4, "room for locals"));
+        // reserve room for globl variables
+        ArrayList<Variable> cv = new ArrayList(dec.vars.values());
+        cv.sort((a, b) -> (a.ordinal - b.ordinal));
+        for (int i = 0; i < cv.size(); i++) {
+            p.add(new Instruction(Vx86.Inx.DATA, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "\""+cv.get(i).name+"\""));
+        }
 
         // print start message
+        p.defLabel("$start");
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, p.newStringId("LOLCode main program started"), "string id of start message"));
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push argument"));
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("output"), "call $output"));
@@ -57,15 +61,13 @@ public class CodeGenerator extends LOLcodeBaseListener {
         p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push argument"));
         p.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.getRuntimeAddress("output"), "call $output"));
 
-        // kill frame and exit
-        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.ESP, Vx86.Mode.REGISTER, Vx86.Reg.EBP, 0, "scratch locals"));
-        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBP, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "kill frame"));
+        // exit
         p.add(new Instruction(Vx86.Inx.RET, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "return to host"));
     }
 
     @Override
     public void enterFunc_decl(LOLcodeParser.Func_declContext ctx) {
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         String name = ctx.getTokens(LOLcodeParser.IDENTIFIER).get(0).getText();
 
         // first, a jump, because in our running program, we want to skip this function as it is being declared
@@ -82,7 +84,7 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     @Override
     public void exitFunc_decl(LOLcodeParser.Func_declContext ctx) {
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         String name = ctx.getTokens(LOLcodeParser.IDENTIFIER).get(0).getText();
 
         p.defLabel(name + "$ret");
@@ -178,8 +180,8 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     @Override
     public void exitProduct(LOLcodeParser.ProductContext ctx) {
-        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 1"));
-        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 2"));
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "prod arg 1"));
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "prod arg 2"));
         p.add(new Instruction(Vx86.Inx.MUL, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
     }
 
@@ -189,15 +191,26 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
         // does it have an initializer?
         if (ctx.getChildCount() != 7) {
+            // if not, load 0 into eax
             p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, 0));
         }
-        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "initial value for \"" + v.name + "\""));
+        
+        // store whatever is in EAX into the variable
+        if (v.global) {
+            p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.MEMORY, Vx86.Reg.NONE, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "initial value for \"" + v.name + "\""));
+        } else {
+            p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "initial value for \"" + v.name + "\""));
+        }
     }
 
     @Override
     public void enterVar_ref(LOLcodeParser.Var_refContext ctx) {
         Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
-        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, v.getOffset(), "load \"" + v.name + "\""));
+        if (v.global) {
+            p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.MEMORY, Vx86.Reg.NONE, v.getOffset(), "load \"" + v.name + "\""));
+        } else {
+            p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, v.getOffset(), "load \"" + v.name + "\""));
+        }
     }
 
     @Override
@@ -221,7 +234,11 @@ public class CodeGenerator extends LOLcodeBaseListener {
     public void exitVar_assignment(LOLcodeParser.Var_assignmentContext ctx) {
         String name = ctx.getChild(0).getChild(0).getText();
         Variable v = ScopeDecoration.findVar(decs, ctx, name);
-        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "store \"" + v.name + "\""));
+        if (v.global) {
+            p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.MEMORY, Vx86.Reg.NONE, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "store \"" + v.name + "\""));
+        } else {
+            p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "store \"" + v.name + "\""));
+        }
     }
 
     @Override
@@ -302,7 +319,7 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     @Override
     public void exitReturn_statement(LOLcodeParser.Return_statementContext ctx) {
-        FunctionDecoration dec = FunctionDecoration.find(decs, ctx);
+        FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         p.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel(dec.name + "$ret"), "jump to common return point"));
     }
 
@@ -311,7 +328,7 @@ public class CodeGenerator extends LOLcodeBaseListener {
         // after these statements, update the pseudo-variable "it"
 
         Variable it = ScopeDecoration.findVar(decs, ctx, "IT");
-        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.INDIRECT, Vx86.Reg.EBP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, it.getOffset(), "update variable \"it\""));
+        p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.MEMORY, Vx86.Reg.NONE, Vx86.Mode.REGISTER, Vx86.Reg.EAX, it.getOffset(), "update variable \"it\""));
     }
 
     // blank instruction to copy

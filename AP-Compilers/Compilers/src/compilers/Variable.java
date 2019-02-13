@@ -14,11 +14,13 @@ public class Variable {
     String name;
     int ordinal;
     Type type;
+    boolean global;
 
-    public Variable(String n, int ord, Type t) {
+    public Variable(String n, Type t) {
         this.name = n;
-        this.ordinal = ord;
+        this.ordinal = 0;
         this.type = t;
+        global = false;
     }
 
     public static enum Type {

@@ -1,2 +1,4 @@
 /P2/OO/dist/
 /AP-Compilers/Compilers/dist/
+*.class
+*.jar
