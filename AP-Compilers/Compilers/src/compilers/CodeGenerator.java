@@ -6,8 +6,6 @@
 package compilers;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import lol.LOLDefaultRuntime;
 import lol.LOLcodeBaseListener;
 import lol.LOLcodeParser;

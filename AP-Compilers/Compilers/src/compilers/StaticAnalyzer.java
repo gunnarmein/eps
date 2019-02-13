@@ -82,6 +82,9 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     public void exitFunc_decl(LOLcodeParser.Func_declContext ctx) {
         FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         //Util.println("Exiting function declaration for " + dec.name + ", counted " + dec.numArgs + " arguments");
+        
+        // reverse the ordinals of the arguments
+        dec.adjustArguments();
     }
 
     @Override

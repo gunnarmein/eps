@@ -7,11 +7,11 @@ hai
     text r "blue"
     visible text
 
-    how duz i speak into numbr
-        visible "speaking"
+    how duz i speak yr yarn aa an yr yarn b into numbr
+        visible "speaking", aa, b mkay
     if u say so
 
-    i duz speak
+    i duz speak yr " a " an yr " b " mkay
 
    how duz i factorial_better yr numbr n into numbr
         i has a numbr result itz 1

@@ -165,8 +165,8 @@ var_assignment: var_rvalue R expr;
 
 // function declaration
 arg_decl: YR vartype IDENTIFIER;
-more_args_decl: (AN arg_decl)* MKAY;
-args_decl: arg_decl more_args_decl?;
+more_args_decl: (AN arg_decl)* ;
+args_decl: arg_decl more_args_decl;
 return_type: INTO vartype;
 func_decl: HOW (IZ|DUZ) I IDENTIFIER args_decl? return_type? separator+ (block separator+)? IF U SAY SO;
 

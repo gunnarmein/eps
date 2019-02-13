@@ -5,6 +5,7 @@
  */
 package compilers;
 
+import java.util.LinkedList;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
@@ -16,6 +17,7 @@ public class FunctionDecoration extends StorageScopeDecoration {
 
     public int numArgs;
     public int numVars;
+    public LinkedList<Variable> args;
 
     public String name;
     public Variable.Type returnType;
@@ -26,6 +28,13 @@ public class FunctionDecoration extends StorageScopeDecoration {
         this.numArgs = 0;
         this.numVars = 0;
         this.returnType = Variable.Type.NULL;
+        this.args = new LinkedList<>();
+    }
+    
+    public void adjustArguments() {
+        for (Variable v:args) {
+            v.ordinal = this.numArgs - v.ordinal + 1;
+        }
     }
 
     public void addParameter(String name, Variable.Type type) {
@@ -33,11 +42,12 @@ public class FunctionDecoration extends StorageScopeDecoration {
             throw new IllegalArgumentException();
         }
 
-        this.numArgs++;
         Variable var = new Variable(name, type);
-        var.ordinal = numArgs + 1;
+        var.ordinal = numArgs;
         var.global = false;
         this.vars.put(name, var);
+        this.args.add(var);
+        this.numArgs++;
     }
 
     @Override
