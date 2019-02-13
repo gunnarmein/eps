@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import lol.LOLDefaultRuntime;
 import lol.LOLcodeBaseListener;
 import lol.LOLcodeParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import vx86.Instruction;
 import vx86.Program;
@@ -29,20 +30,59 @@ public class CodeGenerator extends LOLcodeBaseListener {
         this.decs = decs;
     }
 
+    //
+    // helper functions
+    //
+    public boolean generateForFoldedExpr(ParserRuleContext ctx) {
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        if (dec == null) {
+            return false;
+        }
+
+        // two cases:
+        // one, this expression was folded into another. Generate no code.
+        if (dec.folded) {
+            Util.println("CF: Folded expr " + ctx.getText());
+            return true;
+        }
+
+        // Two, this expression folded its children and now has a defined value. Load that value.
+        if (dec.value != null) {
+            Util.println("CF: Loading folded value " + ctx.getText());
+            loadLiteralFromDec(dec);
+            return true;
+        }
+
+        return false;
+    }
+
+    void loadLiteralFromDec(ExprDecoration dec) {
+        switch (dec.type) {
+            case INTEGER:
+                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, (int) dec.value, "int constant " + dec.value));
+                break;
+            case STRING:
+                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, p.newStringId((String) dec.value), "string constant \"" + dec.value + "\""));
+                break;
+            case FLOAT:
+                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Float.floatToIntBits((float) dec.value), "float constant " + dec.value));
+                break;
+            case BOOLEAN:
+                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, ((boolean) dec.value) ? 1 : 0, "boolean constant " + dec.value));
+                break;
+            default:
+                // not sure how we are here
+                throw new IllegalArgumentException();
+        }
+
+    }
+
     @Override
     public void enterProgram(LOLcodeParser.ProgramContext ctx) {
         GlobalScopeDecoration dec = GlobalScopeDecoration.find(decs, ctx);
 
         // code to label the main entry point
         p.defLabel("$main");
-        p.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, p.refLabel("$start")));
-
-        // reserve room for globl variables
-        ArrayList<Variable> cv = new ArrayList(dec.vars.values());
-        cv.sort((a, b) -> (a.ordinal - b.ordinal));
-        for (int i = 0; i < cv.size(); i++) {
-            p.add(new Instruction(Vx86.Inx.DATA, Vx86.Mode.NONE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "\""+cv.get(i).name+"\""));
-        }
 
         // print start message
         p.defLabel("$start");
@@ -125,6 +165,14 @@ public class CodeGenerator extends LOLcodeBaseListener {
     }
 
     @Override
+    public void exitFoldable_arg(LOLcodeParser.Foldable_argContext ctx) {
+        if (generateForFoldedExpr(ctx)) {
+            return;
+        }
+        p.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "push arg"));
+    }
+
+    @Override
     public void enterOutput_args(LOLcodeParser.Output_argsContext ctx) {
     }
 
@@ -147,30 +195,19 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     @Override
     public void enterLiteral_value(LOLcodeParser.Literal_valueContext ctx) {
+        if (generateForFoldedExpr(ctx)) {
+            return;
+        }
         // put up the type, and any constant it might have
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
-
-        switch (dec.type) {
-            case INTEGER:
-                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, (int) dec.value, "int constant " + dec.value));
-                break;
-            case STRING:
-                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, p.newStringId((String) dec.value), "string constant \"" + dec.value + "\""));
-                break;
-            case FLOAT:
-                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Float.floatToIntBits((float) dec.value), "float constant " + dec.value));
-                break;
-            case BOOLEAN:
-                p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, ((boolean) dec.value) ? 1 : 0, "boolean constant " + dec.value));
-                break;
-            default:
-                // not sure how we are here
-                throw new IllegalArgumentException();
-        }
+        loadLiteralFromDec(dec);
     }
 
     @Override
     public void exitDiff(LOLcodeParser.DiffContext ctx) {
+        if (generateForFoldedExpr(ctx)) {
+            return;
+        }
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 1"));
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "diff arg 2"));
         p.add(new Instruction(Vx86.Inx.SUB, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
@@ -178,6 +215,9 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
     @Override
     public void exitProduct(LOLcodeParser.ProductContext ctx) {
+        if (generateForFoldedExpr(ctx)) {
+            return;
+        }
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "prod arg 1"));
         p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "prod arg 2"));
         p.add(new Instruction(Vx86.Inx.MUL, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
@@ -192,7 +232,7 @@ public class CodeGenerator extends LOLcodeBaseListener {
             // if not, load 0 into eax
             p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, 0));
         }
-        
+
         // store whatever is in EAX into the variable
         if (v.global) {
             p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.MEMORY, Vx86.Reg.NONE, Vx86.Mode.REGISTER, Vx86.Reg.EAX, v.getOffset(), "initial value for \"" + v.name + "\""));
@@ -202,7 +242,15 @@ public class CodeGenerator extends LOLcodeBaseListener {
     }
 
     @Override
+    public void exitExpr(LOLcodeParser.ExprContext ctx) {
+        generateForFoldedExpr(ctx);
+    }
+
+    @Override
     public void enterVar_ref(LOLcodeParser.Var_refContext ctx) {
+        if (generateForFoldedExpr(ctx)) {
+            return;
+        }
         Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
         if (v.global) {
             p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.MEMORY, Vx86.Reg.NONE, v.getOffset(), "load \"" + v.name + "\""));
@@ -327,6 +375,17 @@ public class CodeGenerator extends LOLcodeBaseListener {
 
         Variable it = ScopeDecoration.findVar(decs, ctx, "IT");
         p.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.MEMORY, Vx86.Reg.NONE, Vx86.Mode.REGISTER, Vx86.Reg.EAX, it.getOffset(), "update variable \"it\""));
+    }
+
+    @Override
+    public void exitSum(LOLcodeParser.SumContext ctx) {
+        if (generateForFoldedExpr(ctx)) {
+            return;
+        }
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "sum arg 1"));
+        p.add(new Instruction(Vx86.Inx.POP, Vx86.Mode.REGISTER, Vx86.Reg.EBX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0, "sum arg 2"));
+        p.add(new Instruction(Vx86.Inx.ADD, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.REGISTER, Vx86.Reg.EBX, 0));
+
     }
 
     // blank instruction to copy

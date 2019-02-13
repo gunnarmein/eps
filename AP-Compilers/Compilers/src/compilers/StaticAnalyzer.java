@@ -239,6 +239,13 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         ExprDecoration dec = new ExprDecoration(ctx);
         decs.put(ctx, dec);
     }
+    
+    @Override
+    public void enterSum(LOLcodeParser.SumContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+    }
 
     @Override
     public void exitProduct(LOLcodeParser.ProductContext ctx) {
@@ -248,7 +255,20 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
 
         // has to be numeric
         if (dec.type != Variable.Type.FLOAT && dec.type != Variable.Type.INTEGER) {
-            error("Illegal type for diff", ctx);
+            error("Illegal type for product", ctx);
+            return;
+        }
+    }
+
+    @Override
+    public void exitSum(LOLcodeParser.SumContext ctx) {
+        // get decoration, promote types
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        setTypeFromChildren(ctx);
+
+        // has to be numeric
+        if (dec.type != Variable.Type.FLOAT && dec.type != Variable.Type.INTEGER) {
+            error("Illegal type for sum", ctx);
             return;
         }
     }
@@ -268,13 +288,27 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     }
 
     @Override
+    public void enterFoldable_arg(LOLcodeParser.Foldable_argContext ctx) {
+        // put up the type, and any constant it might have
+        ExprDecoration dec = new ExprDecoration(ctx);
+        decs.put(ctx, dec);
+    }
+
+    @Override
+    public void exitFoldable_arg(LOLcodeParser.Foldable_argContext ctx) {
+        // get decoration, promote types
+        ExprDecoration dec = (ExprDecoration) decs.get(ctx);
+        setTypeFromChildren(ctx);
+    }
+
+    @Override
     public void exitFunc_call(LOLcodeParser.Func_callContext ctx) {
     }
 
     private void setTypeFromChildren(ParserRuleContext ctx) {
         // put up the type, and any constant it might have
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
-        //Util.println("Setting type for " + ctx.getClass().getName());
+        Util.println("Setting type for " + ctx.getClass().getName());
 
         // type upward propagation: if all subnodes have same type, make that ours
         for (int i = 0; i < ctx.getChildCount(); i++) {

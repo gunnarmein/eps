@@ -54,6 +54,18 @@ public class LOLcodeBaseListener implements LOLcodeListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFoldable_arg(LOLcodeParser.Foldable_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFoldable_arg(LOLcodeParser.Foldable_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSum(LOLcodeParser.SumContext ctx) { }
 	/**
 	 * {@inheritDoc}

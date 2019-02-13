@@ -117,9 +117,10 @@ vartype: NUMBR | NUMBAR | YARN | TROOF |NOOB;
 
 // expressions
 
-sum: SUM OF naked_arg AN naked_arg;
-diff:  DIFF OF naked_arg AN naked_arg;
-product:   PRODUKT OF naked_arg AN naked_arg ;
+foldable_arg:expr; // need this to allow constant folding, naked_arg, on the other hand, cannot be folded
+sum: SUM OF foldable_arg AN foldable_arg;
+diff:  DIFF OF foldable_arg AN foldable_arg;
+product:   PRODUKT OF foldable_arg AN foldable_arg ;
 quotient:   QUOSHUNT OF naked_arg AN naked_arg ;
 bigger: IZ BIGGR naked_arg THAN naked_arg;
 smallr: IZ SMALLR naked_arg THAN naked_arg;

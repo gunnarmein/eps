@@ -40,6 +40,16 @@ public interface LOLcodeListener extends ParseTreeListener {
 	 */
 	void exitVartype(LOLcodeParser.VartypeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link LOLcodeParser#foldable_arg}.
+	 * @param ctx the parse tree
+	 */
+	void enterFoldable_arg(LOLcodeParser.Foldable_argContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LOLcodeParser#foldable_arg}.
+	 * @param ctx the parse tree
+	 */
+	void exitFoldable_arg(LOLcodeParser.Foldable_argContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link LOLcodeParser#sum}.
 	 * @param ctx the parse tree
 	 */

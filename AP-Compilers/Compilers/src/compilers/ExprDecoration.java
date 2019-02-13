@@ -5,7 +5,8 @@
  */
 package compilers;
 
-import java.util.HashMap;
+import lol.LOLcodeParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
@@ -17,11 +18,17 @@ public class ExprDecoration extends Decoration {
 
     Variable.Type type;
     Object value;
-    
+    boolean folded;
+
     ExprDecoration(ParseTree ctx) {
         super(ctx);
         type = Variable.Type.NULL;
         value = null;
+        folded = false;
     }
-    
+
+    static ExprDecoration get(ParseTreeProperty<Decoration> decs, ParseTree ctx) {
+        return (ExprDecoration) decs.get(ctx);
+    }
+
 }

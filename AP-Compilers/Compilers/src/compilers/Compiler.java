@@ -46,6 +46,10 @@ public class Compiler {
             return null;
         }
         Util.println("Static analysis successful.");
+        
+        ConstantFolder cf = new ConstantFolder(checker.decs);
+        ParseTreeWalker.DEFAULT.walk(cf, tree);
+        Util.println("Constant folding complete, folded "+cf.total+" times");
 
         // now create a code generator, passing on decorations from checker phase
         CodeGenerator cgen = new CodeGenerator(checker.decs);

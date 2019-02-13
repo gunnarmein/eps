@@ -31,6 +31,12 @@ public interface LOLcodeVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVartype(LOLcodeParser.VartypeContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link LOLcodeParser#foldable_arg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFoldable_arg(LOLcodeParser.Foldable_argContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link LOLcodeParser#sum}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
