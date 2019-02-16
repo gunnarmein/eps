@@ -19,7 +19,7 @@ public class Compilers {
 
     public static void main(String[] args) throws IOException {
         Util.debugOn();
-        
+
         Vx86 vm = new Vx86();
 
         /*
@@ -47,8 +47,7 @@ public class Compilers {
         vm.setup(program2);
         vm.run();
 
-        */
-        
+         */
         //
         // now, compile an actual lolcode example
         //
@@ -56,10 +55,13 @@ public class Compilers {
         if (p == null) {
             return;
         }
-        
+
+    
+    
         p.dump();
-        vm.setup(p);
-        vm.run();
+        
+        //vm.setup(p);
+        //vm.run();
     }
 
 }

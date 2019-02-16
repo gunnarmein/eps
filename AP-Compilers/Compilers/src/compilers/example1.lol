@@ -1,5 +1,8 @@
 hai
-    i has a numbr variable itz sum of 5 an 4
+    i has a numbr variable itz  10
+    i'm in yr loop1 nerfin yr variable til both saem variable an 1     
+    i'm outta yr loop1
+
     visible produkt of 3 an 5
     variable r diff of 5 an 6
     i has a yarn text

@@ -22,7 +22,10 @@ public class Vx86 {
         EDX,
         ESP,
         EBP,
-        FLAGS
+        FLAGS,
+        ANY, // for searching/matching
+        THIS, // for searching/matching
+        THAT        // for searching/matching
     }
 
     public static enum Mode {
@@ -30,7 +33,10 @@ public class Vx86 {
         REGISTER,
         IMMEDIATE,
         MEMORY,
-        INDIRECT
+        INDIRECT,
+        ANY, // for searching/matching
+        THIS, // for searching/matching
+        THAT        // for searching/matching
     }
 
     public static enum Inx {
@@ -63,7 +69,9 @@ public class Vx86 {
         JL,
         JLE,
         JMP,
-        DATA
+        ANY, // for searching/matching
+        THIS, // for searching/matching
+        THAT        // for searching/matching
     }
 
     //
@@ -220,30 +228,30 @@ public class Vx86 {
             switch (ix.name) {
                 // mov x y - copies y (either a constant value or the content of a register) into register x
                 case MOV:
-                    data = readSrc(ix.opSrc, ix.src, ix.value);
-                    writeDest(ix.opDest, ix.dest, ix.value, data);
+                    data = readSrc(ix.modeSrc, ix.regSrc, (Integer) ix.value);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, data);
                     break;
 
                 case PUSH:
-                    data = readSrc(ix.opDest, ix.dest, ix.value);
+                    data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     push(data);
                     break;
 
                 case POP:
                     data = pop();
-                    writeDest(ix.opDest, ix.dest, ix.value, data);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, data);
                     break;
 
                 case CALL:
                     push(eip);
                 // intentional fall-through
                 case JMP:
-                    if (ix.opDest == Mode.IMMEDIATE && ix.value > 10000) {
-                        runtime.invokeRoutine(this, ix.value);
+                    if (ix.modeDest == Mode.IMMEDIATE && (Integer) ix.value > 10000) {
+                        runtime.invokeRoutine(this, (Integer) ix.value);
                         Util.print(Util.rightJustify(Util.ANSI_RESET, 100));
 
                     } else {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
@@ -258,49 +266,49 @@ public class Vx86 {
                     }
                     eip = pop();
                     stack = readRegister(Reg.ESP);
-                    data = readSrc(ix.opDest, ix.dest, ix.value);
+                    data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     stack += data;
                     writeRegister(Reg.ESP, stack);
                     break;
 
                 case ADD:
-                    src = readSrc(ix.opSrc, ix.src, ix.value);
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    src = readSrc(ix.modeSrc, ix.regSrc, (Integer) ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     data = dest + src;
                     zf = data == 0;
                     cf = src > dest;
-                    writeDest(ix.opDest, ix.dest, ix.value, data);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, data);
                     break;
 
                 case SUB:
-                    src = readSrc(ix.opSrc, ix.src, ix.value);
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    src = readSrc(ix.modeSrc, ix.regSrc, (Integer) ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     data = dest - src;
                     zf = data == 0;
                     cf = src > dest;
-                    writeDest(ix.opDest, ix.dest, ix.value, data);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, data);
                     break;
 
                 case CMP:
-                    src = readSrc(ix.opSrc, ix.src, ix.value);
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    src = readSrc(ix.modeSrc, ix.regSrc, (Integer) ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     data = dest - src;
                     zf = data == 0;
                     cf = src > dest;
                     break;
 
                 case MUL:
-                    src = readSrc(ix.opSrc, ix.src, ix.value);
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    src = readSrc(ix.modeSrc, ix.regSrc, (Integer) ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     data = dest * src;
                     zf = data == 0;
                     cf = dest > data;
-                    writeDest(ix.opDest, ix.dest, ix.value, data);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, data);
                     break;
 
                 case DIV:
-                    src = readSrc(ix.opSrc, ix.src, ix.value);
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    src = readSrc(ix.modeSrc, ix.regSrc, (Integer) ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     if (src == 0) {
                         System.err.println("Vx86: Divide by Zero at " + (eip - 1));
                         throw new IllegalArgumentException();
@@ -308,29 +316,29 @@ public class Vx86 {
                     data = dest / src;
                     zf = data == 0;
                     cf = false;
-                    writeDest(ix.opDest, ix.dest, ix.value, data);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, data);
                     break;
 
                 case INC:
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     dest++;
                     zf = dest == 0;
                     cf = dest == Integer.MIN_VALUE;
-                    writeDest(ix.opDest, ix.dest, ix.value, dest);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, dest);
                     break;
 
                 case DEC:
-                    dest = readSrc(ix.opDest, ix.dest, ix.value);
+                    dest = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                     dest--;
                     zf = dest == 0;
                     cf = dest == Integer.MAX_VALUE;
-                    writeDest(ix.opDest, ix.dest, ix.value, dest);
+                    writeDest(ix.modeDest, ix.regDest, (Integer) ix.value, dest);
                     break;
 
                 case JZ:
                 case JE:
                     if (zf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
@@ -338,49 +346,49 @@ public class Vx86 {
                 case JNZ:
                 case JNE:
                     if (!zf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
 
                 case JC:
                     if (cf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip = data;
                     }
                     break;
 
                 case JNC:
                     if (!cf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
 
                 case JG:
                     if (!cf && !zf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
 
                 case JGE:
                     if (!cf || zf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
 
                 case JL:
                     if (cf && !zf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;
 
                 case JLE:
                     if (cf || zf) {
-                        data = readSrc(ix.opDest, ix.dest, ix.value);
+                        data = readSrc(ix.modeDest, ix.regDest, (Integer) ix.value);
                         eip += data;
                     }
                     break;

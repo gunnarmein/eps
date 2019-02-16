@@ -6,7 +6,10 @@
 package vx86;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -103,26 +106,92 @@ public class Program {
 
     public void add(Instruction ix) {
         this.instructions.add(ix);
+        
     }
 
-    public void dump() {
-        int line = 0;
-        for (Instruction x : instructions) {
+    public Instruction get(int line) {
+        return this.instructions.get(line);
+    }
+
+    public int size() {
+        return this.instructions.size();
+    }
+    
+    public List<Instruction> subList(int a, int b) {
+        return instructions.subList(a, b);
+    }
+
+    public void addAll(int line, Collection<Instruction> code) {
+        this.instructions.addAll(line, code);
+
+       for (Label l : this.labels.values()) {
+            if (l.line >= line) {
+                l.line += code.size();
+            }
+            LinkedList<Integer> newRefs = new LinkedList<>();
+            for (int i:l.refs) {
+                newRefs.add(i >= line? i+code.size():i);
+            }
+            
+            l.refs = newRefs;
+        }
+    }
+    
+    public void replace(int line, int size, Collection<Instruction> newCode){
+        for (int i = 0; i< size; i++) {
+            remove(line);
+        }
+        
+        addAll(line, newCode);
+    }
+
+    public void remove(int line) {
+        this.instructions.remove(line);
+       
+        for (Label l : this.labels.values()) {
+            if (l.line >= line) {
+                l.line--;
+            }
+            LinkedList<Integer> newRefs = new LinkedList<>();
+            for (int i:l.refs) {
+                newRefs.add(i >= line? i-1:i);
+            }
+            
+            l.refs = newRefs;
+        }
+    }
+ public void dumpLabelsAndRefs() {
+        for (Label l : this.labels.values()) {
+            Util.println("Label "+l.name +": "+l.line);
+            for (int i:l.refs) {
+                Util.println("  ref in "+i);
+            }
+        }
+    }
+
+    public void dumpFragment(int start, List<Instruction> fragment) {
+        for (int line = start; line < start+fragment.size(); line++) {
+            Instruction x = fragment.get(line-start);
             Label l = labelLines.get(line);
             if (l != null) {
                 Util.println(l.name + ":");
             }
             if (x.name == Vx86.Inx.NONE) {
-                Util.println("; " + Util.ANSI_BLUE+x.comment+Util.ANSI_RESET);
-                line++;
+                Util.println("; " + Util.ANSI_BLUE + x.comment + Util.ANSI_RESET);
                 continue;
             }
             Util.println(Util.rightJustify("" + line, 4) + ": " + x);
-            line++;
             // extra line after ret
             if (x.name == Vx86.Inx.RET) {
                 Util.println("");
             }
         }
+    }
+    public void dumpPartial(int start, int length) {
+        dumpFragment(start, instructions.subList(start, start+length));
+    }
+
+    public void dump() {
+        dumpPartial(0, instructions.size());
     }
 }

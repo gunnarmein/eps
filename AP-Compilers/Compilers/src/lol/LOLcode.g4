@@ -187,7 +187,7 @@ func_call: I (DUZ|IZ) IDENTIFIER args?;
 loop_action: (UPPIN | NERFIN) YR var_rvalue;
 loop_condition: (TIL|WILE) expr;
 loop_end: IM OUTTA YR;
-loop: IM IN YR IDENTIFIER loop_action loop_condition separator+ block separator+ loop_end IDENTIFIER;
+loop: IM IN YR IDENTIFIER loop_action loop_condition separator+ (block separator+)? loop_end IDENTIFIER;
 
 // switch / case
 

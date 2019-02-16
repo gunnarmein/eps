@@ -82,7 +82,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     public void exitFunc_decl(LOLcodeParser.Func_declContext ctx) {
         FunctionDecoration dec = FunctionDecoration.findContaining(decs, ctx);
         //Util.println("Exiting function declaration for " + dec.name + ", counted " + dec.numArgs + " arguments");
-        
+
         // reverse the ordinals of the arguments
         dec.adjustArguments();
     }
@@ -159,6 +159,16 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         // put up the type, and any constant it might have
         OutputArgListDecoration dec = new OutputArgListDecoration(ctx);
         decs.put(ctx, dec);
+    }
+
+    @Override
+    public void exitInput(LOLcodeParser.InputContext ctx) {
+        String name = ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText();
+        Variable v = ScopeDecoration.findVar(decs, ctx, name);
+        if (v == null) {
+            error("Unknown variable for GIMMEH: " + name, ctx);
+            return;
+        }
     }
 
     @Override
@@ -239,7 +249,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
         ExprDecoration dec = new ExprDecoration(ctx);
         decs.put(ctx, dec);
     }
-    
+
     @Override
     public void enterSum(LOLcodeParser.SumContext ctx) {
         // put up the type, and any constant it might have
@@ -308,7 +318,7 @@ public class StaticAnalyzer extends LOLcodeBaseListener {
     private void setTypeFromChildren(ParserRuleContext ctx) {
         // put up the type, and any constant it might have
         ExprDecoration dec = (ExprDecoration) decs.get(ctx);
-        Util.println("Setting type for " + ctx.getClass().getName());
+        //Util.println("Setting type for " + ctx.getClass().getName());
 
         // type upward propagation: if all subnodes have same type, make that ours
         for (int i = 0; i < ctx.getChildCount(); i++) {

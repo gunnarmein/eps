@@ -42,13 +42,13 @@ public class CodeGenerator extends LOLcodeBaseListener {
         // two cases:
         // one, this expression was folded into another. Generate no code.
         if (dec.folded) {
-            Util.println("CF: Folded expr " + ctx.getText());
+            //Util.println("CF: Folded expr " + ctx.getText());
             return true;
         }
 
         // Two, this expression folded its children and now has a defined value. Load that value.
         if (dec.value != null) {
-            Util.println("CF: Loading folded value " + ctx.getText());
+            //Util.println("CF: Loading folded value " + ctx.getText());
             loadLiteralFromDec(dec);
             return true;
         }
@@ -262,10 +262,6 @@ public class CodeGenerator extends LOLcodeBaseListener {
     @Override
     public void exitInput(LOLcodeParser.InputContext ctx) {
         Variable v = ScopeDecoration.findVar(decs, ctx, ctx.getToken(LOLcodeParser.IDENTIFIER, 0).getText());
-        if (v == null) {
-            Util.println("Unknown variable for GIMMEH: " + v.name);
-            throw new IllegalArgumentException();
-        }
         if (v.type != Variable.Type.STRING) {
             Util.println("Type mismatch for GIMMEH: " + v.name);
             throw new IllegalArgumentException();
