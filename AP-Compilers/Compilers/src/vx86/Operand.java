@@ -18,6 +18,9 @@ public class Operand {
     public int value;
 
     public Operand() {
+        this.mode = Vx86.Mode.NONE;
+        this.reg = Vx86.Reg.NONE;
+        this.value = 0;
     }
 
     public Operand(Vx86.Mode mode, Vx86.Reg reg, int number) {

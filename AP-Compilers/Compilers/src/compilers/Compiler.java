@@ -26,6 +26,8 @@ import vx86.Vx86;
 public class Compiler {
 
     static Program compile(InputStream is) throws IOException {
+        int length; 
+        
         CharStream cs = CharStreams.fromStream(is);
         LOLcodeLexer lexer = new LOLcodeLexer(cs);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -60,12 +62,12 @@ public class Compiler {
         if (p == null) {
             return null;
         }
-        Util.println("Code generation successful.");
+        length = p.size();
+        Util.println("Code generation successful, size: "+length+" lines.");
         p.resolveLabels();
-        p.dump();
+        //p.dump();
 
         Util.println("Starting data flow analysis:");
-        int length = p.size();
         DataFlow df = new DataFlow();
         for (int i = 0; i < p.size(); i++) {
             p.resolveLabels();
@@ -74,14 +76,14 @@ public class Compiler {
         }
         Util.println("Dataflow analysis done, reduced code from " + length + " to " + p.size() + " instructions");
         p.resolveLabels();
-        p.dump();
+//        p.dump();
 
         Util.println("Starting Peephole optimizations ... ");
         length = p.size();
-        PeepHoleEngine pe = new PeepHoleEngine();
-        List<PeepHoleApplication> patterns = PeepHoleApplication.generateAllPatterns();
+        PeepholeEngine pe = new PeepholeEngine();
+        List<PeepholeApplication> patterns = PeepholeApplication.generateAllPatterns();
         pe.processAll(p, patterns);
-        Util.println("Peephole optimization done, reduced code from " + length + " to " + p.size() + " instructions");
+        Util.println("Peephole optimization done, reduced code from " + length + " to " + p.size() + " lines");
 
         // resolve again as peephole optimizations might have shifted jump targets
         p.resolveLabels();

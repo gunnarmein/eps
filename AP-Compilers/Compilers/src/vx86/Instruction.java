@@ -206,55 +206,58 @@ public class Instruction {
         return null;
     }
 
-    public void fillThisAndThat(Object thisObj, Object thatObj) {
+    public Instruction fillThisAndThat(MatchingObject thisObj, MatchingObject thatObj) {
+        Instruction result = new Instruction(this.name, this.modeDest, this.regDest, this.modeSrc, this.regSrc, this.value, this.comment);
         // this
         if (this.name == Inx.THIS) {
-            this.name = (Inx) thisObj;
+            result.name =  thisObj.name;
         }
         if (this.modeDest == Mode.THIS) {
             Operand dest = (Operand) thisObj;
-            this.modeDest = dest.mode;
+            result.modeDest = dest.mode;
         }
         if (this.modeSrc == Mode.THIS) {
             Operand src = (Operand) thisObj;
-            this.modeSrc = src.mode;
+            result.modeSrc = src.mode;
         }
         if (this.regSrc == Reg.THIS) {
             Operand src = (Operand) thisObj;
-            this.regSrc = src.reg;
+            result.regSrc = src.reg;
         }
         if (this.regDest == Reg.THIS) {
             Operand dest = (Operand) thisObj;
-            this.regDest = dest.reg;
+            result.regDest = dest.reg;
         }
         if (this.value.equals("THIS")) {
             Operand v = (Operand) thisObj;
-            this.value = v.value;
+            result.value = v.value;
         }
 
         // that
         if (this.name == Inx.THAT) {
-            this.name = (Inx) thatObj;
+            result.name = thatObj.name;
         }
         if (this.modeDest == Mode.THAT) {
             Operand dest = (Operand) thatObj;
-            this.modeDest = dest.mode;
+            result.modeDest = dest.mode;
         }
         if (this.modeSrc == Mode.THAT) {
             Operand src = (Operand) thatObj;
-            this.modeSrc = src.mode;
+            result.modeSrc = src.mode;
         }
         if (this.regSrc == Reg.THAT) {
             Operand src = (Operand) thatObj;
-            this.regSrc = src.reg;
+            result.regSrc = src.reg;
         }
         if (this.regDest == Reg.THAT) {
             Operand dest = (Operand) thatObj;
-            this.regDest = dest.reg;
+            result.regDest = dest.reg;
         }
         if (this.value.equals("THAT")) {
             Operand v = (Operand) thatObj;
-            this.value = v.value;
+            result.value = v.value;
         }
+        
+        return result;
     }
 }

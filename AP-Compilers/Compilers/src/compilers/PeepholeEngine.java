@@ -12,13 +12,12 @@ import vx86.Instruction;
 import vx86.MatchingObject;
 import vx86.Program;
 import vx86.Util;
-import vx86.Vx86;
 
 /**
  *
  * @author gmein
  */
-public class PeepHoleEngine {
+public class PeepholeEngine {
 
     public static class Pattern {
 
@@ -39,18 +38,23 @@ public class PeepHoleEngine {
             matchThat = null;
         }
 
-        public boolean match(List<Instruction> sample) {
+        public boolean match(List<Instruction> sample, boolean trace) {
             Iterator<Instruction> p = this.list.iterator();
             Iterator<Instruction> s = sample.iterator();
             clear();
 
             while (p.hasNext() && s.hasNext()) {
-                //Util.print(".");
                 Instruction xp = p.next();
                 Instruction xs = s.next();
-
+              
+                if (trace) {
+                    Util.print(".");
+                }
                 if (!xp.matches(xs, matchThis, matchThat)) {
                     clear();
+                    if (trace) {
+                        Util.println("  no match");
+                    }
                     return false;
                 }
 
@@ -64,43 +68,55 @@ public class PeepHoleEngine {
 
             // whole pattern matched?
             if (!p.hasNext()) {
+                if (trace) {
+                    Util.println("  found");
+                }
                 return true;
             }
 
+            if (trace) {
+                Util.println("  no match");
+            }
             matchThis = null;
             matchThat = null;
             return false;
         }
 
-        public void fillFrom(Pattern src) {
+        public List<Instruction> fillFrom(Pattern src) {
+            LinkedList<Instruction> list = new LinkedList<>();
             for (Instruction x : this.list) {
-                x.fillThisAndThat(src.matchThis, src.matchThat);
+                list.add(x.fillThisAndThat(src.matchThis, src.matchThat));
             }
+            
+            return list;
         }
 
     }
 
-    void process(Program p, PeepHoleApplication pa) {
+    void process(Program p, PeepholeApplication pa) {
         for (int i = 0; i < p.size(); i++) {
             // peephole engine needs resolved labels to work, will resolve again later
             p.resolveLabels();
+            if (pa.lineOfInterest == i) {
+                Util.println("Watching matching of pattern " + pa.name + " at line " + pa.lineOfInterest);
+            }
             pa.pattern.clear();
-            if (pa.pattern.match(p.subList(i, i + Math.min(p.size() - i, pa.pattern.list.size())))) {
-                //Util.print("Match found for " + pa.name + " in " + i + ", replacing, variables: ");
-                //Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
-                pa.substitution.fillFrom(pa.pattern);
-                p.replace(i, pa.pattern.list.size(), pa.substitution.list);
+            if (pa.pattern.match(p.subList(i, i + Math.min(p.size() - i, pa.pattern.list.size())), i == pa.lineOfInterest)) {
+                Util.print("Match found for " + pa.name + " in " + i + ", replacing, variables: ");
+                Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
+                List<Instruction> filled = pa.substitution.fillFrom(pa.pattern);
+                p.replace(i, pa.pattern.list.size(),filled);
                 pa.pattern.clear();
             }
         }
     }
 
-    void processAll(Program p, List<PeepHoleApplication> lps) {
+    void processAll(Program p, List<PeepholeApplication> lps) {
         int oldSize;
         do {
             oldSize = p.size();
             // process all patterns
-            for (PeepHoleApplication pa : lps) {
+            for (PeepholeApplication pa : lps) {
                 process(p, pa);
                 //Util.println("Done processing pattern " + pa.name);
                 //p.dump();
