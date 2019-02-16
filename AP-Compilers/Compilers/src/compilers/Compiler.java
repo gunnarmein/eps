@@ -75,16 +75,7 @@ public class Compiler {
         p.resolveLabels();
         PeepHoleEngine pe = new PeepHoleEngine();
         List<PeepHoleApplication> patterns = PeepHoleApplication.generateAllPatterns();
-        int oldSize;
-        do {
-            oldSize = p.size();
-            // process all patterns
-            for (PeepHoleApplication pa : patterns) {
-                pe.process(p, pa);
-                Util.println("Done processing pattern "+pa.name);
-                p.dump();
-            }
-        } while (p.size() != oldSize); // until no more improvement
+        pe.processAll(p, patterns);
 
         // resolve again as peephole optimizations might have shifted jump targets
         p.resolveLabels();

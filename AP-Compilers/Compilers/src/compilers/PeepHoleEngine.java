@@ -81,6 +81,7 @@ public class PeepHoleEngine {
 
     void process(Program p, PeepHoleApplication pa) {
         for (int i = 0; i < p.size(); i++) {
+            pa.pattern.clear();
             if (pa.pattern.match(p.subList(i, i + Math.min(p.size() - i, pa.pattern.list.size())))) {
                 Util.print(" Match found for " + pa.name + " in " + i + ", replacing, variables: ");
                 Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
@@ -89,5 +90,18 @@ public class PeepHoleEngine {
                 pa.pattern.clear();
             }
         }
+    }
+
+    void processAll(Program p, List<PeepHoleApplication> lps) {
+        int oldSize;
+        do {
+            oldSize = p.size();
+            // process all patterns
+            for (PeepHoleApplication pa : lps) {
+                process(p, pa);
+                Util.println("Done processing pattern " + pa.name);
+                p.dump();
+            }
+        } while (p.size() != oldSize); // until no more improvement
     }
 }
