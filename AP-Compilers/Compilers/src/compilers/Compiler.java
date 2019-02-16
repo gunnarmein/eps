@@ -73,13 +73,15 @@ public class Compiler {
             i += df.optimize(p, i);
         }
         Util.println("Dataflow analysis done, reduced code from " + length + " to " + p.size() + " instructions");
+        p.resolveLabels();
+        p.dump();
 
-        
-        
-        Util.println("Starting PeepHole optimizations ... ");
+        Util.println("Starting Peephole optimizations ... ");
+        length = p.size();
         PeepHoleEngine pe = new PeepHoleEngine();
         List<PeepHoleApplication> patterns = PeepHoleApplication.generateAllPatterns();
         pe.processAll(p, patterns);
+        Util.println("Peephole optimization done, reduced code from " + length + " to " + p.size() + " instructions");
 
         // resolve again as peephole optimizations might have shifted jump targets
         p.resolveLabels();

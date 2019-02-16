@@ -3,7 +3,7 @@ hai
     i'm in yr loop1 nerfin yr variable til both saem variable an 1     
     i'm outta yr loop1
 
-    OBTW
+    
     visible produkt of 3 an 5
     variable r diff of 5 an 6
     i has a yarn text

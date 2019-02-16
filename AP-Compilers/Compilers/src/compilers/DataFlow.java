@@ -6,6 +6,8 @@
 package compilers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -173,7 +175,9 @@ public class DataFlow {
             }
         }
         // pass two - registers themselves
-        for (Entry<Operand, Operand> e : data.entrySet()) {
+        ArrayList<Entry<Operand, Operand>> list = new ArrayList<>(data.entrySet());
+        list.sort((a,b)->a.getKey().toString().compareTo(b.getKey().toString())); // sort registers alphabetically
+        for (Entry<Operand, Operand> e : list) {
             src = e.getValue();
             dest = e.getKey();
             if (dest.mode == Vx86.Mode.REGISTER

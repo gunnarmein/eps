@@ -98,7 +98,7 @@ public class Program {
     }
 
     public void resolveLabels() {
-        Util.println("Resolving labels and refs:");
+        //Util.println("Resolving labels and refs:");
 
         for (Label l : labels.values()) {
 
@@ -106,7 +106,7 @@ public class Program {
                 if (l.defined) {
                     Instruction ix = instructions.get(refLine);
                     ix.value = l.line - (refLine + 1);
-                    Util.println("Updating reference to " + l.name + "(" + l.line + ") at " + refLine + ": rel " + ix.value);
+                    //Util.println("Updating reference to " + l.name + "(" + l.line + ") at " + refLine + ": rel " + ix.value);
                 } else {
                     System.err.println("Reference to undefined label " + l.name + " at " + refLine);
                     throw new IllegalArgumentException();
@@ -159,9 +159,9 @@ public class Program {
 
         addAll(line, newCode);
 
-        Util.println("At: " + line + ", replaced " + size + " lines of code with " + newCode.size());
+        //Util.println("At: " + line + ", replaced " + size + " lines of code with " + newCode.size());
         resolveLabels();
-        dump();
+        //dump();
     }
 
     public void remove(int line) {

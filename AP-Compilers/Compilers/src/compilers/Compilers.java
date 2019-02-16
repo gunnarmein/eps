@@ -56,10 +56,6 @@ public class Compilers {
             return;
         }
 
-    
-    
-        p.dump();
-        
         //vm.setup(p);
         //vm.run();
     }
