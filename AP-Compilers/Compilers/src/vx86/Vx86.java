@@ -15,6 +15,7 @@ public class Vx86 {
     public static final int RUNTIME_BASE = 2 * 1024 * 1024;
 
     public static enum Reg {
+
         NONE,
         EAX,
         EBX,
@@ -25,7 +26,7 @@ public class Vx86 {
         FLAGS,
         ANY, // for searching/matching
         THIS, // for searching/matching
-        THAT        // for searching/matching
+        THAT      // for searching/matching
     }
 
     public static enum Mode {

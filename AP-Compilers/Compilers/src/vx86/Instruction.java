@@ -124,14 +124,26 @@ public class Instruction {
         return null;
     }
 
-    // invoked on pattern instruction
-    public boolean matches(Instruction that) {
-        if ((this.name == that.name || this.name == Inx.ANY || this.name == Inx.THIS || this.name == Inx.THAT)
-                && (this.modeDest == that.modeDest || this.modeDest == Mode.ANY || this.modeDest == Mode.THIS || this.modeDest == Mode.THAT)
-                && (this.modeSrc == that.modeSrc || this.modeSrc == Mode.ANY || this.modeSrc == Mode.THIS || this.modeSrc == Mode.THAT)
-                && (this.regDest == that.regDest || this.regDest == Reg.ANY || this.regDest == Reg.THIS || this.regDest == Reg.THAT)
-                && (this.regSrc == that.regSrc || this.regSrc == Reg.ANY || this.regSrc == Reg.THIS || this.regSrc == Reg.THAT)
-                && (this.value.equals(that.value) || this.value.equals("ANY") || this.value.equals("THIS") || this.value.equals("THAT"))) {
+    // invoked on pattern instructions only, to match real instruction
+    public boolean matches(Instruction other, MatchingObject thisOp, MatchingObject thatOp) {
+        if ((this.name == other.name || this.name == Inx.ANY
+                || (this.name == Inx.THIS&& (thisOp == null || thisOp.name == other.name))
+                || (this.name == Inx.THAT&& (thatOp == null || thatOp.name == other.name)))
+                && (this.modeDest == other.modeDest || this.modeDest == Mode.ANY
+                || (this.modeDest == Mode.THIS && (thisOp == null || thisOp.mode == other.modeDest))
+                || (this.modeDest == Mode.THAT && (thatOp == null || thatOp.mode == other.modeDest)))
+                && (this.modeSrc == other.modeSrc || this.modeSrc == Mode.ANY
+                || (this.modeSrc == Mode.THIS && (thisOp == null || thisOp.mode == other.modeSrc))
+                || (this.modeSrc == Mode.THAT && (thatOp == null || thatOp.mode == other.modeSrc)))
+                && (this.regDest == other.regDest || this.regDest == Reg.ANY
+                || (this.regDest == Reg.THIS && (thisOp == null || thisOp.reg == other.regDest))
+                || (this.regDest == Reg.THAT && (thatOp == null || thatOp.reg == other.regDest)))
+                && (this.regSrc == other.regSrc || this.regSrc == Reg.ANY
+                || (this.regSrc == Reg.THIS && (thisOp == null || thisOp.reg == other.regSrc))
+                || (this.regSrc == Reg.THAT && (thatOp == null || thatOp.reg == other.regSrc)))
+                && (this.value.equals(other.value) || this.value.equals("ANY") 
+                || (this.value.equals("THIS") && (thisOp == null || other.value.equals(thisOp.value)))
+                || (this.value.equals("THAT") && (thatOp == null || other.value.equals(thatOp.value))))) {
             return true;
         }
         return false;
@@ -139,51 +151,56 @@ public class Instruction {
     }
 
     //invoked on pattern instruction
-    public Object extractThis(Instruction x) {
+    public MatchingObject extractThis(Instruction x) {
         if (this.name == Inx.THIS) {
-            return x.name;
+            return new MatchingObject(x.name);
         }
         if (this.modeDest == Mode.THIS) {
-            return new Operand(x.modeDest, x.regDest, (Integer) x.value);
+            return new MatchingObject(x.modeDest, x.regDest, (Integer) x.value);
         }
         if (this.modeSrc == Mode.THIS) {
-            return new Operand(x.modeSrc, x.regSrc, (Integer) x.value);
+            return new MatchingObject(x.modeSrc, x.regSrc, (Integer) x.value);
         }
         if (this.regSrc == Reg.THIS) {
-            return new Operand(x.modeSrc, x.regSrc, (Integer) x.value);
+            return new MatchingObject(x.modeSrc, x.regSrc, (Integer) x.value);
         }
         if (this.regDest == Reg.THIS) {
-            if (x.regDest == Reg.EAX) {
-                x = x;
-            }
-            return new Operand(x.modeDest, x.regDest, (Integer) x.value);
+            return new MatchingObject(x.modeDest, x.regDest, (Integer) x.value);
         }
         if (this.value.equals("THIS")) {
-            return new Operand((Integer) x.value);
+            if (x.modeDest == Mode.IMMEDIATE || x.modeDest == Mode.MEMORY || x.modeDest == Mode.INDIRECT) {
+                return new MatchingObject(x.modeDest, x.regDest, (Integer) x.value);
+            } else {
+                return new MatchingObject(x.modeSrc, x.regSrc, (Integer) x.value);
+            }
         }
 
         return null;
     }
 
     // invoked on pattern instruction
-    public Object extractThat(Instruction x) {
+    public MatchingObject extractThat(Instruction x) {
         if (this.name == Inx.THAT) {
-            return x.name;
+            return new MatchingObject(x.name);
         }
         if (this.modeDest == Mode.THAT) {
-            return new Operand(x.modeDest, x.regDest, (Integer) x.value);
+            return new MatchingObject(x.modeDest, x.regDest, (Integer) x.value);
         }
         if (this.modeSrc == Mode.THAT) {
-            return new Operand(x.modeSrc, x.regSrc, (Integer) x.value);
+            return new MatchingObject(x.modeSrc, x.regSrc, (Integer) x.value);
         }
         if (this.regSrc == Reg.THAT) {
-            return new Operand(x.modeSrc, x.regSrc, (Integer) x.value);
+            return new MatchingObject(x.modeSrc, x.regSrc, (Integer) x.value);
         }
         if (this.regDest == Reg.THAT) {
-            return new Operand(x.modeDest, x.regDest, (Integer) x.value);
+            return new MatchingObject(x.modeDest, x.regDest, (Integer) x.value);
         }
         if (this.value.equals("THAT")) {
-            return new Operand((Integer) x.value);
+            if (x.modeDest == Mode.IMMEDIATE || x.modeDest == Mode.MEMORY || x.modeDest == Mode.INDIRECT) {
+                return new MatchingObject(x.modeDest, x.regDest, (Integer) x.value);
+            } else {
+                return new MatchingObject(x.modeSrc, x.regSrc, (Integer) x.value);
+            }
         }
 
         return null;

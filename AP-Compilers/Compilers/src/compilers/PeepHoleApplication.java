@@ -27,6 +27,7 @@ public class PeepHoleApplication {
         LinkedList<PeepHoleApplication> list = new LinkedList<>();
         list.add(generateLoopConditionPattern());
         list.add(generateCmpImmediatePattern());
+        list.add(generateJmpZeroPattern());
         return list;
     }
 
@@ -97,6 +98,23 @@ public class PeepHoleApplication {
         // careful not to have any ANY in this pattern, and THIS and THAT only is you supply them from the search pattern
         PeepHoleEngine.Pattern sub = new PeepHoleEngine.Pattern();
         sub.add(new Instruction(Vx86.Inx.CMP, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, "THAT"));
+        pa.substitution = sub;
+
+        return pa;
+    }
+    public static PeepHoleApplication generateJmpZeroPattern() {
+        /*
+        find this pattern, and replace transplant the marked parts
+        we donb't like JMP 0
+         */
+
+        PeepHoleApplication pa = new PeepHoleApplication("jmpZeroPattern");
+        PeepHoleEngine.Pattern pt = new PeepHoleEngine.Pattern();
+
+        pt.add(new Instruction(Vx86.Inx.JMP, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
+        pa.pattern = pt;
+
+        PeepHoleEngine.Pattern sub = new PeepHoleEngine.Pattern();
         pa.substitution = sub;
 
         return pa;

@@ -61,24 +61,29 @@ public class Compiler {
             return null;
         }
         Util.println("Code generation successful.");
+        p.resolveLabels();
+        p.dump();
 
+        Util.println("Starting data flow analysis:");
         int length = p.size();
         DataFlow df = new DataFlow();
         for (int i = 0; i < p.size(); i++) {
+            p.resolveLabels();
             df.clear();
             i += df.optimize(p, i);
         }
+        Util.println("Dataflow analysis done, reduced code from " + length + " to " + p.size() + " instructions");
 
-        System.out.println("Dataflow analysis done, reduced code from " + length + " to " + p.size() + " instructions");
-
-        // peephole engine needs resolved labels to work, will resolve again later
-        p.resolveLabels();
+        
+        
+        Util.println("Starting PeepHole optimizations ... ");
         PeepHoleEngine pe = new PeepHoleEngine();
         List<PeepHoleApplication> patterns = PeepHoleApplication.generateAllPatterns();
         pe.processAll(p, patterns);
 
         // resolve again as peephole optimizations might have shifted jump targets
         p.resolveLabels();
+        p.dump();
         return p;
     }
 }

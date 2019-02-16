@@ -17,15 +17,19 @@ public class Operand {
     public Vx86.Reg reg;
     public int value;
 
+    public Operand() {
+    }
+
     public Operand(Vx86.Mode mode, Vx86.Reg reg, int number) {
         this.mode = mode;
         this.reg = reg;
         this.value = mode == Vx86.Mode.REGISTER ? 0 : number;
     }
-   public Operand(Vx86.Mode mode, Vx86.Reg reg, Object number) {
+
+    public Operand(Vx86.Mode mode, Vx86.Reg reg, Object number) {
         this.mode = mode;
         this.reg = reg;
-        this.value = mode == Vx86.Mode.REGISTER ? 0 : (Integer)number;
+        this.value = mode == Vx86.Mode.REGISTER ? 0 : (Integer) number;
     }
 
     public Operand(Vx86.Reg reg) {

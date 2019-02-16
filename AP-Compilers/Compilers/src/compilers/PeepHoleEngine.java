@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import vx86.Instruction;
+import vx86.MatchingObject;
 import vx86.Program;
 import vx86.Util;
 import vx86.Vx86;
@@ -22,8 +23,8 @@ public class PeepHoleEngine {
     public static class Pattern {
 
         LinkedList<Instruction> list;
-        Object matchThis;
-        Object matchThat;
+        MatchingObject matchThis;
+        MatchingObject matchThat;
 
         public Pattern() {
             list = new LinkedList<>();
@@ -41,15 +42,15 @@ public class PeepHoleEngine {
         public boolean match(List<Instruction> sample) {
             Iterator<Instruction> p = this.list.iterator();
             Iterator<Instruction> s = sample.iterator();
+            clear();
 
             while (p.hasNext() && s.hasNext()) {
                 //Util.print(".");
                 Instruction xp = p.next();
                 Instruction xs = s.next();
 
-                if (!xp.matches(xs)) {
-                    matchThis = null;
-                    matchThat = null;
+                if (!xp.matches(xs, matchThis, matchThat)) {
+                    clear();
                     return false;
                 }
 
@@ -81,10 +82,12 @@ public class PeepHoleEngine {
 
     void process(Program p, PeepHoleApplication pa) {
         for (int i = 0; i < p.size(); i++) {
+            // peephole engine needs resolved labels to work, will resolve again later
+            p.resolveLabels();
             pa.pattern.clear();
             if (pa.pattern.match(p.subList(i, i + Math.min(p.size() - i, pa.pattern.list.size())))) {
-                Util.print(" Match found for " + pa.name + " in " + i + ", replacing, variables: ");
-                Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
+                //Util.print("Match found for " + pa.name + " in " + i + ", replacing, variables: ");
+                //Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
                 pa.substitution.fillFrom(pa.pattern);
                 p.replace(i, pa.pattern.list.size(), pa.substitution.list);
                 pa.pattern.clear();
@@ -99,8 +102,8 @@ public class PeepHoleEngine {
             // process all patterns
             for (PeepHoleApplication pa : lps) {
                 process(p, pa);
-                Util.println("Done processing pattern " + pa.name);
-                p.dump();
+                //Util.println("Done processing pattern " + pa.name);
+                //p.dump();
             }
         } while (p.size() != oldSize); // until no more improvement
     }

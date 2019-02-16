@@ -89,13 +89,24 @@ public class Program {
         return l.defined;
     }
 
+    private void updateLabelLinesIndex() {
+        HashMap<Integer, Label> newLines = new HashMap<>();
+        for (Label l : this.labelLines.values()) {
+            newLines.put(l.line, l);
+        }
+        this.labelLines = newLines;
+    }
+
     public void resolveLabels() {
+        Util.println("Resolving labels and refs:");
+
         for (Label l : labels.values()) {
 
             for (Integer refLine : l.refs) {
                 if (l.defined) {
                     Instruction ix = instructions.get(refLine);
                     ix.value = l.line - (refLine + 1);
+                    Util.println("Updating reference to " + l.name + "(" + l.line + ") at " + refLine + ": rel " + ix.value);
                 } else {
                     System.err.println("Reference to undefined label " + l.name + " at " + refLine);
                     throw new IllegalArgumentException();
@@ -106,7 +117,6 @@ public class Program {
 
     public void add(Instruction ix) {
         this.instructions.add(ix);
-        
     }
 
     public Instruction get(int line) {
@@ -116,7 +126,7 @@ public class Program {
     public int size() {
         return this.instructions.size();
     }
-    
+
     public List<Instruction> subList(int a, int b) {
         return instructions.subList(a, b);
     }
@@ -124,54 +134,68 @@ public class Program {
     public void addAll(int line, Collection<Instruction> code) {
         this.instructions.addAll(line, code);
 
-       for (Label l : this.labels.values()) {
-            if (l.line >= line) {
+        for (Label l : this.labels.values()) {
+            if (l.line > line) {
                 l.line += code.size();
             }
             LinkedList<Integer> newRefs = new LinkedList<>();
-            for (int i:l.refs) {
-                newRefs.add(i >= line? i+code.size():i);
+            for (int i : l.refs) {
+                newRefs.add(i >= line ? i + code.size() : i);
             }
-            
+
             l.refs = newRefs;
         }
+
+        updateLabelLinesIndex();
     }
-    
-    public void replace(int line, int size, Collection<Instruction> newCode){
-        for (int i = 0; i< size; i++) {
+
+    public void replace(int line, int size, Collection<Instruction> newCode) {
+        for (int i = 0; i < size; i++) {
             remove(line);
+            //Util.println("removed " + 1 + " lines of code");
+            //resolveLabels();
+            //dump();
         }
-        
+
         addAll(line, newCode);
+
+        Util.println("At: " + line + ", replaced " + size + " lines of code with " + newCode.size());
+        resolveLabels();
+        dump();
     }
 
     public void remove(int line) {
         this.instructions.remove(line);
-       
+
         for (Label l : this.labels.values()) {
-            if (l.line >= line) {
+            if (l.line > line) {
                 l.line--;
             }
             LinkedList<Integer> newRefs = new LinkedList<>();
-            for (int i:l.refs) {
-                newRefs.add(i >= line? i-1:i);
+            for (int i : l.refs) {
+                if (i != line) {
+                    newRefs.add(i > line ? i - 1 : i);
+                }
             }
-            
+
             l.refs = newRefs;
         }
+        updateLabelLinesIndex();
     }
- public void dumpLabelsAndRefs() {
+
+    public void dumpLabelsAndRefs() {
+        Util.println("Labels and Refs:");
         for (Label l : this.labels.values()) {
-            Util.println("Label "+l.name +": "+l.line);
-            for (int i:l.refs) {
-                Util.println("  ref in "+i);
+            Util.println("Label " + l.name + ": " + l.line);
+            for (int i : l.refs) {
+                Util.println("  ref in " + i);
             }
         }
     }
 
     public void dumpFragment(int start, List<Instruction> fragment) {
-        for (int line = start; line < start+fragment.size(); line++) {
-            Instruction x = fragment.get(line-start);
+        for (int line = start; line < start + fragment.size(); line++) {
+            Instruction x = fragment.get(line - start);
             Label l = labelLines.get(line);
             if (l != null) {
                 Util.println(l.name + ":");
@@ -187,8 +211,9 @@ public class Program {
             }
         }
     }
+
     public void dumpPartial(int start, int length) {
-        dumpFragment(start, instructions.subList(start, start+length));
+        dumpFragment(start, instructions.subList(start, start + length));
     }
 
     public void dump() {
