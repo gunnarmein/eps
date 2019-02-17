@@ -25,9 +25,11 @@ import vx86.Vx86;
  */
 public class Compiler {
 
+    public static boolean dataflow = false;
+
     static Program compile(InputStream is) throws IOException {
-        int length; 
-        
+        int length;
+
         CharStream cs = CharStreams.fromStream(is);
         LOLcodeLexer lexer = new LOLcodeLexer(cs);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -63,20 +65,22 @@ public class Compiler {
             return null;
         }
         length = p.size();
-        Util.println("Code generation successful, size: "+length+" lines.");
+        Util.println("Code generation successful, size: " + length + " lines.");
         p.resolveLabels();
         //p.dump();
 
-        Util.println("Starting data flow analysis:");
-        DataFlow df = new DataFlow();
-        for (int i = 0; i < p.size(); i++) {
+        if (dataflow) {
+            Util.println("Starting data flow analysis:");
+            DataFlow df = new DataFlow();
+            for (int i = 0; i < p.size(); i++) {
+                p.resolveLabels();
+                df.clear();
+                i += df.optimize(p, i);
+            }
+            Util.println("Dataflow analysis done, reduced code from " + length + " to " + p.size() + " instructions");
             p.resolveLabels();
-            df.clear();
-            i += df.optimize(p, i);
-        }
-        Util.println("Dataflow analysis done, reduced code from " + length + " to " + p.size() + " instructions");
-        p.resolveLabels();
 //        p.dump();
+        }
 
         Util.println("Starting Peephole optimizations ... ");
         length = p.size();

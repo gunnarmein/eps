@@ -108,7 +108,7 @@ public class PeepholeApplication {
         sub.add(new Instruction(Vx86.Inx.THIS, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.THAT, Vx86.Reg.THAT, "THAT"));
         pa.substitution = sub;
 
-        pa.lineOfInterest = 85;
+        //pa.lineOfInterest = 85;
         
         return pa;
     }
