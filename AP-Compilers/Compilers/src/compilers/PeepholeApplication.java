@@ -33,10 +33,10 @@ public class PeepholeApplication {
         list.add(generateLoopConditionPattern());
         list.add(generateXXXEAXImmediatePattern());
         list.add(generateXXXEBXImmediatePattern());
-        //list.add(generateJmpZeroPattern());
-        //list.add(generatePushPopPattern());
-        //list.add(generatePushMovPopPattern());
-        //list.add(generatePushPopRegRegPattern());
+        list.add(generateJmpZeroPattern());
+        list.add(generatePushPopPattern());
+        list.add(generatePushMovPopPattern());
+        list.add(generatePushPopRegRegPattern());
         return list;
     }
 

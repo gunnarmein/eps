@@ -14,10 +14,8 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import vx86.Instruction;
 import vx86.Program;
 import vx86.Util;
-import vx86.Vx86;
 
 /**
  *
@@ -25,7 +23,7 @@ import vx86.Vx86;
  */
 public class Compiler {
 
-    public static boolean dataflow = false;
+    public static boolean dataflow = true;
 
     static Program compile(InputStream is) throws IOException {
         int length;
