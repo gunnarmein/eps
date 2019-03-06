@@ -1,6 +1,5 @@
 package compilers;
 
-import java.util.List;
 import lol.LOLcodeBaseListener;
 import lol.LOLcodeParser;
 import org.antlr.v4.runtime.ParserRuleContext;

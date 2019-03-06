@@ -102,8 +102,8 @@ public class PeepholeEngine {
             }
             pa.pattern.clear();
             if (pa.pattern.match(p.subList(i, i + Math.min(p.size() - i, pa.pattern.list.size())), i == pa.lineOfInterest)) {
-                Util.print("Match found for " + pa.name + " in " + i + ", replacing, variables: ");
-                Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
+                //Util.print("Match found for " + pa.name + " in " + i + ", replacing, variables: ");
+                //Util.println(pa.pattern.matchThis + ", " + pa.pattern.matchThat);
                 List<Instruction> filled = pa.substitution.fillFrom(pa.pattern);
                 p.replace(i, pa.pattern.list.size(),filled);
                 pa.pattern.clear();

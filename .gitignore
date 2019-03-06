@@ -2,3 +2,5 @@
 /AP-Compilers/Compilers/dist/
 *.class
 *.jar
+/AP-TICS/ArduinoComm/build/
+/AP-TICS/ArduinoComm/dist/

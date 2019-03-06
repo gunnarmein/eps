@@ -37,6 +37,8 @@ public class PeepholeApplication {
         list.add(generatePushPopPattern());
         list.add(generatePushMovPopPattern());
         list.add(generatePushPopRegRegPattern());
+        list.add(generatePushImmediatePattern());
+        list.add(generatePushImmediate2Pattern());
         return list;
     }
 
@@ -171,6 +173,47 @@ public class PeepholeApplication {
         return pa;
     }
 
+        public static PeepholeApplication generatePushImmediatePattern() {
+        /*
+         */
+
+        PeepholeApplication pa = new PeepholeApplication("generatePushImmediatePattern");
+        PeepholeEngine.Pattern pt = new PeepholeEngine.Pattern();
+
+        pt.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, "THIS"));
+        pt.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
+        pt.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, "THAT"));
+        pa.pattern = pt;
+
+        PeepholeEngine.Pattern sub = new PeepholeEngine.Pattern();
+        sub.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, "THIS"));
+        sub.add(new Instruction(Vx86.Inx.CALL, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, "THAT"));
+        pa.substitution = sub;
+
+        return pa;
+    }
+
+        
+             public static PeepholeApplication generatePushImmediate2Pattern() {
+        /*
+         */
+
+        PeepholeApplication pa = new PeepholeApplication("generatePushImmediate2Pattern");
+        PeepholeEngine.Pattern pt = new PeepholeEngine.Pattern();
+
+        pt.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, "THIS"));
+        pt.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.NONE, Vx86.Reg.NONE, 0));
+        pt.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.THAT, Vx86.Reg.THAT, "THAT"));
+        pa.pattern = pt;
+
+        PeepholeEngine.Pattern sub = new PeepholeEngine.Pattern();
+        sub.add(new Instruction(Vx86.Inx.PUSH, Vx86.Mode.IMMEDIATE, Vx86.Reg.NONE, Vx86.Mode.NONE, Vx86.Reg.NONE, "THIS"));
+        sub.add(new Instruction(Vx86.Inx.MOV, Vx86.Mode.REGISTER, Vx86.Reg.EAX, Vx86.Mode.THAT, Vx86.Reg.THAT, "THAT"));
+        pa.substitution = sub;
+        
+        return pa;
+    }
+    
     public static PeepholeApplication generatePushPopRegRegPattern() {
         /*
         we don't like push eXx/pop eYx, can do move instead
